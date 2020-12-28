@@ -1,5 +1,22 @@
 import Config
 
+config :gviz, GVizWeb.Endpoint,
+  url: [host: "pham.jasonaxelson.com"],
+  http: [port: 80],
+  secret_key_base: "HEY05EB1dFVSu6KykKHuS4rQPQzSHv4F7mGVB/gnDLrIu75wE/ytBXy2TaL3A6RA",
+  live_view: [signing_salt: "AAAABjEyERMkxgDh"],
+  check_origin: false,
+  root: Path.dirname(__DIR__),
+  server: true,
+  render_errors: [view: GVizWeb.ErrorView, accepts: ~w(html json), layout: false],
+  pubsub_server: GViz.PubSub,
+  code_reloader: false
+
+config :gviz, :phoenix_endpoint, GVizWeb.Endpoint
+
+config :gviz,
+  namespace: GViz
+
 # Use shoehorn to start the main application. See the shoehorn
 # docs for separating out critical OTP applications such as those
 # involved with firmware updates.
