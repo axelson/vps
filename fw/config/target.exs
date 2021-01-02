@@ -3,6 +3,7 @@ import Config
 config :gviz, GVizWeb.Endpoint,
   url: [host: "pham.jasonaxelson.com"],
   http: [port: 80],
+  https: [port: 443],
   secret_key_base: "HEY05EB1dFVSu6KykKHuS4rQPQzSHv4F7mGVB/gnDLrIu75wE/ytBXy2TaL3A6RA",
   live_view: [signing_salt: "AAAABjEyERMkxgDh"],
   check_origin: false,
@@ -15,7 +16,9 @@ config :gviz, GVizWeb.Endpoint,
 config :gviz, :phoenix_endpoint, GVizWeb.Endpoint
 
 config :gviz,
-  namespace: GViz
+  namespace: GViz,
+  cert_mode: "production",
+  site_encrypt_db_folder: Path.join(~w[/data site_encrypt])
 
 # Use shoehorn to start the main application. See the shoehorn
 # docs for separating out critical OTP applications such as those
