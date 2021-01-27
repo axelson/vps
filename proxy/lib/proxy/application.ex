@@ -6,16 +6,15 @@ defmodule Proxy.Application do
   use Application
 
   def start(_type, _args) do
-    children = [
-      # Start the Telemetry supervisor
-      ProxyWeb.Telemetry,
-      # Start the PubSub system
-      {Phoenix.PubSub, name: Proxy.PubSub},
-      # Start the Endpoint (http/https)
-      ProxyWeb.Endpoint
-      # Start a worker by calling: Proxy.Worker.start_link(arg)
-      # {Proxy.Worker, arg}
-    ]
+    children =
+      List.flatten([
+        ProxyWeb.Telemetry,
+        {Phoenix.PubSub, name: Proxy.PubSub},
+
+        {SiteEncrypt.Phoenix, ProxyWeb.Endpoint},
+
+        ProxyWeb.MyProxy,
+      ])
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options

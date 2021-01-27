@@ -1,24 +1,61 @@
 import Config
 
+config :logger,
+  backends: [RingLogger]
+
+config :master_proxy,
+  http: [:inet6, port: 80],
+  https: [:inet6, port: 443]
+
+config :site_encrypt, sites: [{ProxyWeb.Endpoint, ProxyWeb.SiteEncryptImpl}]
+
+config :proxy,
+  cert_mode: "production",
+  site_encrypt_db_folder: Path.join(~w[/data site_encrypt]),
+  site_encrypt_domains: ["pham.jasonaxelson.com", "depviz.jasonaxelson.com", "makeuplive.jasonaxelson.com"],
+  depviz_domain: "depviz.jasonaxelson.com",
+  makeuplive_domain: "makeuplive.jasonaxelson.com"
+
+config :proxy, ProxyWeb.Endpoint,
+  url: [host: "pham.jasonaxelson.com", port: 80],
+  secret_key_base: "//YcYyKOATqeqDuhCCjGuk0jpsZLR/KwcFlePCc9Cqab5WBIbkVXYk8HlTeHVLJt",
+  render_errors: [view: ProxyWeb.ErrorView, accepts: ~w(json), layout: false],
+  pubsub_server: Proxy.PubSub,
+  live_view: [signing_salt: "B4RFj8oi"],
+  server: false
+
 config :gviz, GVizWeb.Endpoint,
-  url: [host: "pham.jasonaxelson.com"],
-  http: [port: 80],
-  https: [port: 443],
-  secret_key_base: "HEY05EB1dFVSu6KykKHuS4rQPQzSHv4F7mGVB/gnDLrIu75wE/ytBXy2TaL3A6RA",
+  url: [host: "depviz.jasonaxelson.com", port: 443],
+  hostname: "depviz.jasonaxelson.com",
   live_view: [signing_salt: "AAAABjEyERMkxgDh"],
   check_origin: false,
   root: Path.dirname(__DIR__),
-  server: true,
+  server: false,
   render_errors: [view: GVizWeb.ErrorView, accepts: ~w(html json), layout: false],
   pubsub_server: GViz.PubSub,
   code_reloader: false
 
 config :gviz, :phoenix_endpoint, GVizWeb.Endpoint
 
-config :gviz,
-  namespace: GViz,
-  cert_mode: "production",
-  site_encrypt_db_folder: Path.join(~w[/data site_encrypt])
+config :gviz, namespace: GViz
+
+config :makeup_live, MakeupLiveWeb.Endpoint,
+  url: [host: "makeuplive.jasonaxelson.com", port: 443],
+  hostname: "makeuplive.jasonaxelson.com",
+  check_origin: false,
+  root: Path.dirname(__DIR__),
+  render_errors: [view: MakeupLiveWeb.ErrorView, accepts: ~w(html json)],
+  pubsub_server: MakeupLive.PubSub,
+  server: false,
+  force_ssl: [rewrite_on: [:x_forwarded_proto]],
+  cache_static_manifest: "priv/static/cache_manifest.json",
+  live_view: [signing_salt: "NpREzhguz87xA0eEUC6IcMT2PLRDIuCw"]
+
+config :gviz, GVizWeb.Endpoint,
+  secret_key_base: "ceI+YsDLAW7ZysZivz9xpu9d+eLo/5/E9TS2bPKPmZz1PrQ7H6iF5jm2CHMU71j/"
+
+config :makeup_live, MakeupLiveWeb.Endpoint,
+  secret_key_base: "7uIEeJiHEIc8ikQb07KqrPu3cTpCiodskjUL+TdUFnfERXaGLsX4XuCjLwASbVWZ"
 
 # Use shoehorn to start the main application. See the shoehorn
 # docs for separating out critical OTP applications such as those
@@ -81,7 +118,7 @@ config :vintage_net,
     {"wlan0", %{type: VintageNetWiFi}}
   ]
 
-#config :mdns_lite,
+# config :mdns_lite,
 #  # The `host` key specifies what hostnames mdns_lite advertises.  `:hostname`
 #  # advertises the device's hostname.local. For the official Nerves systems, this
 #  # is "nerves-<4 digit serial#>.local".  mdns_lite also advertises

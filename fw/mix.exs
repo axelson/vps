@@ -35,7 +35,7 @@ defmodule Fw.MixProject do
       {:shoehorn, "~> 0.7.0"},
       {:ring_logger, "~> 0.8.1"},
       {:toolshed, "~> 0.2.13"},
-      {:gviz, path: "~/dev/gviz", targets: @all_targets, env: Mix.env()},
+      {:proxy, path: "../proxy"},
 
       # Dependencies for all targets except :host
       {:nerves_runtime, "~> 0.11.3", targets: @all_targets},
@@ -62,6 +62,7 @@ defmodule Fw.MixProject do
       include_erts: &Nerves.Release.erts/0,
       steps: [&Nerves.Release.init/1, :assemble],
       strip_beams: Mix.env() == :prod
+      #config_providers: [{Fw.RuntimeConfigProvider, "/data/runtime_config.exs"}]
     ]
   end
 end

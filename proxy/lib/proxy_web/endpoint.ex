@@ -1,5 +1,6 @@
 defmodule ProxyWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :proxy
+  use SiteEncrypt.Phoenix
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
@@ -42,4 +43,32 @@ defmodule ProxyWeb.Endpoint do
   plug Plug.Head
   plug Plug.Session, @session_options
   plug ProxyWeb.Router
+
+  @impl Phoenix.Endpoint
+  def init(_key, config) do
+    # Merge SiteEncrypt configuration
+    {:ok, SiteEncrypt.Phoenix.configure_https(config)}
+  end
+
+  def certification do
+    SiteEncrypt.configure(
+      # id: ProxyWeb.Endpoint,
+      # callback: ProxyWeb.SiteEncryptImpl,
+      client: :native,
+      domains: Application.fetch_env!(:proxy, :site_encrypt_domains),
+      emails: ["contact@jasonaxelson.com"],
+      db_folder: Application.fetch_env!(:proxy, :site_encrypt_db_folder),
+      directory_url:
+        case Application.get_env(:proxy, :cert_mode, "local") do
+          "local" ->
+            {:internal, port: Application.fetch_env!(:proxy, :site_encrypt_internal_port)}
+
+          "staging" ->
+            "https://acme-staging-v02.api.letsencrypt.org/directory"
+
+          "production" ->
+            "https://acme-v02.api.letsencrypt.org/directory"
+        end
+    )
+  end
 end

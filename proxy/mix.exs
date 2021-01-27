@@ -37,7 +37,11 @@ defmodule Proxy.MixProject do
       {:telemetry_metrics, "~> 0.4"},
       {:telemetry_poller, "~> 0.4"},
       {:jason, "~> 1.0"},
-      {:plug_cowboy, "~> 2.0"}
+      {:plug_cowboy, "~> 2.0"},
+      {:site_encrypt, github: "sasa1977/site_encrypt"},
+      {:master_proxy, github: "axelson/master_proxy", branch: "flexiblity-1"},
+      {:gviz, path: "~/dev/gviz"},
+      {:makeup_live, path: "~/dev/makeup_live"}
     ]
   end
 
