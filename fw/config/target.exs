@@ -18,16 +18,13 @@ config :proxy,
 
 config :proxy, ProxyWeb.Endpoint,
   url: [host: "pham.jasonaxelson.com", port: 80],
-  secret_key_base: "//YcYyKOATqeqDuhCCjGuk0jpsZLR/KwcFlePCc9Cqab5WBIbkVXYk8HlTeHVLJt",
   render_errors: [view: ProxyWeb.ErrorView, accepts: ~w(json), layout: false],
   pubsub_server: Proxy.PubSub,
-  live_view: [signing_salt: "B4RFj8oi"],
   server: false
 
 config :gviz, GVizWeb.Endpoint,
   url: [host: "depviz.jasonaxelson.com", port: 443],
   hostname: "depviz.jasonaxelson.com",
-  live_view: [signing_salt: "AAAABjEyERMkxgDh"],
   check_origin: false,
   root: Path.dirname(__DIR__),
   server: false,
@@ -48,14 +45,7 @@ config :makeup_live, MakeupLiveWeb.Endpoint,
   pubsub_server: MakeupLive.PubSub,
   server: false,
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
-  cache_static_manifest: "priv/static/cache_manifest.json",
-  live_view: [signing_salt: "NpREzhguz87xA0eEUC6IcMT2PLRDIuCw"]
-
-config :gviz, GVizWeb.Endpoint,
-  secret_key_base: "ceI+YsDLAW7ZysZivz9xpu9d+eLo/5/E9TS2bPKPmZz1PrQ7H6iF5jm2CHMU71j/"
-
-config :makeup_live, MakeupLiveWeb.Endpoint,
-  secret_key_base: "7uIEeJiHEIc8ikQb07KqrPu3cTpCiodskjUL+TdUFnfERXaGLsX4XuCjLwASbVWZ"
+  cache_static_manifest: "priv/static/cache_manifest.json"
 
 # Use shoehorn to start the main application. See the shoehorn
 # docs for separating out critical OTP applications such as those
@@ -77,7 +67,9 @@ config :nerves_runtime, :kernel, use_system_registry: false
 
 config :nerves,
   erlinit: [
-    hostname_pattern: "nerves-%s"
+    hostname_pattern: "nerves-%s",
+    # Workaround for https://github.com/nerves-project/nerves/issues/632
+    env: "RELEASE_SYS_CONFIG=/srv/erlang/releases/0.1.0/sys"
   ]
 
 # Configure the device for SSH IEx prompt access and firmware updates
