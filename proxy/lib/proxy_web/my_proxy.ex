@@ -10,6 +10,10 @@ defmodule ProxyWeb.MyProxy do
       %{
         domain: Application.fetch_env!(:proxy, :makeuplive_domain),
         phoenix_endpoint: MakeupLiveWeb.Endpoint
+      },
+      %{
+        domain: Application.fetch_env!(:proxy, :sketch_domain),
+        phoenix_endpoint: SketchpadWeb.Endpoint
       }
     ]
 

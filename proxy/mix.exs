@@ -41,7 +41,8 @@ defmodule Proxy.MixProject do
       {:site_encrypt, github: "sasa1977/site_encrypt"},
       {:master_proxy, github: "axelson/master_proxy", branch: "flexiblity-1"},
       {:gviz, path: "~/dev/gviz"},
-      {:makeup_live, path: "~/dev/makeup_live"}
+      {:makeup_live, path: "~/dev/makeup_live"},
+      {:sketchpad, path: "~/dev/forks/sketchpad"}
     ]
   end
 

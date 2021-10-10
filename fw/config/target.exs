@@ -12,9 +12,15 @@ config :site_encrypt, sites: [{ProxyWeb.Endpoint, ProxyWeb.SiteEncryptImpl}]
 config :proxy,
   cert_mode: "production",
   site_encrypt_db_folder: Path.join(~w[/data site_encrypt]),
-  site_encrypt_domains: ["pham.jasonaxelson.com", "depviz.jasonaxelson.com", "makeuplive.jasonaxelson.com"],
+  site_encrypt_domains: [
+    "pham.jasonaxelson.com",
+    "depviz.jasonaxelson.com",
+    "makeuplive.jasonaxelson.com",
+    "sketch.jasonaxelson.com"
+  ],
   depviz_domain: "depviz.jasonaxelson.com",
-  makeuplive_domain: "makeuplive.jasonaxelson.com"
+  makeuplive_domain: "makeuplive.jasonaxelson.com",
+  sketch_domain: "sketch.jasonaxelson.com"
 
 config :proxy, ProxyWeb.Endpoint,
   url: [host: "pham.jasonaxelson.com", port: 80],
@@ -39,6 +45,7 @@ config :gviz, namespace: GViz
 config :makeup_live, MakeupLiveWeb.Endpoint,
   url: [host: "makeuplive.jasonaxelson.com", port: 443],
   hostname: "makeuplive.jasonaxelson.com",
+  secret_key_base: "BCqHloAfzORpn/TX90PB9GULWVRZpjwegD4U8T1on/RUmEYTjkVGLC2YKFhkhLiS",
   check_origin: false,
   root: Path.dirname(__DIR__),
   render_errors: [view: MakeupLiveWeb.ErrorView, accepts: ~w(html json)],
@@ -46,6 +53,20 @@ config :makeup_live, MakeupLiveWeb.Endpoint,
   server: false,
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
   cache_static_manifest: "priv/static/cache_manifest.json"
+
+config :sketchpad, SketchpadWeb.Endpoint,
+  url: [host: "sketch.jasonaxelson.com", port: 80],
+  hostname: "sketch.jasonaxelson.com",
+  secret_key_base: "BCqHloAfzORpn/TX90PB9GULWVRZpjwegD4U8T1on/RUmEYTjkVGLC2YKFhkhLiS",
+  render_errors: [view: SketchpadWeb.ErrorView, accepts: ~w(html json)],
+  check_origin: false,
+  root: Path.dirname(__DIR__),
+  render_errors: [view: MakeupLiveWeb.ErrorView, accepts: ~w(html json)],
+  pubsub_server: MakeupLive.PubSub,
+  server: false,
+  cache_static_manifest: "priv/static/cache_manifest.json",
+  pubsub_server: Sketchpad.PubSub,
+  code_reloader: false
 
 # Use shoehorn to start the main application. See the shoehorn
 # docs for separating out critical OTP applications such as those

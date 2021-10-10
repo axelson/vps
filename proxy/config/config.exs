@@ -12,10 +12,16 @@ config :logger,
 
 config :proxy,
   cert_mode: "local",
-  site_encrypt_domains: ["pham.jasonaxelson.com", "depviz.jasonaxelson.com", "makeuplive.jasonaxelson.com"],
+  site_encrypt_domains: [
+    "pham.jasonaxelson.com",
+    "depviz.jasonaxelson.com",
+    "makeuplive.jasonaxelson.com",
+    "sketch.jasonaxelson.com"
+  ],
   site_encrypt_db_folder: "/home/jason/dev/vps/proxy/tmp",
   depviz_domain: "depviz.test",
   makeuplive_domain: "makeuplive.test",
+  sketch_domain: "sketch.test",
   site_encrypt_internal_port: 4106
 
 config :master_proxy,
@@ -54,6 +60,20 @@ config :makeup_live, MakeupLiveWeb.Endpoint,
   server: false,
   cache_static_manifest: "priv/static/cache_manifest.json",
   live_view: [signing_salt: "NpREzhguz87xA0eEUC6IcMT2PLRDIuCw"]
+
+config :sketchpad, SketchpadWeb.Endpoint,
+  url: [host: "sketch.test", port: 80],
+  hostname: "sketch.test",
+  secret_key_base: "BCqHloAfzORpn/TX90PB9GULWVRZpjwegD4U8T1on/RUmEYTjkVGLC2YKFhkhLiS",
+  render_errors: [view: SketchpadWeb.ErrorView, accepts: ~w(html json)],
+  check_origin: false,
+  root: Path.dirname(__DIR__),
+  render_errors: [view: MakeupLiveWeb.ErrorView, accepts: ~w(html json)],
+  pubsub_server: MakeupLive.PubSub,
+  server: false,
+  cache_static_manifest: "priv/static/cache_manifest.json",
+  pubsub_server: Sketchpad.PubSub,
+  code_reloader: false
 
 # Configures Elixir's Logger
 config :logger, :console,
