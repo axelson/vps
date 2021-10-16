@@ -16,12 +16,14 @@ config :proxy,
     "pham.jasonaxelson.com",
     "depviz.jasonaxelson.com",
     "makeuplive.jasonaxelson.com",
-    "sketch.jasonaxelson.com"
+    "sketch.jasonaxelson.com",
+    "jamroom.hassanshaikley.jasonaxelson.com"
   ],
-  site_encrypt_db_folder: "/home/jason/dev/vps/proxy/tmp",
+  site_encrypt_db_folder: Path.join([System.get_env("HOME"), "dev/vps/proxy/tmp"]),
   depviz_domain: "depviz.test",
   makeuplive_domain: "makeuplive.test",
   sketch_domain: "sketch.test",
+  jamroom_domain: "jamroom.hassanshaikley.jasonaxelson.com"
   site_encrypt_internal_port: 4106
 
 config :master_proxy,

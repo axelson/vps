@@ -33,16 +33,17 @@ defmodule Proxy.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.5.7"},
+      {:phoenix, "~> 1.6.0"},
       {:telemetry_metrics, "~> 0.4"},
       {:telemetry_poller, "~> 0.4"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
-      {:site_encrypt, github: "sasa1977/site_encrypt"},
+      {:site_encrypt, "~> 0.4"},
       {:master_proxy, github: "axelson/master_proxy", branch: "flexiblity-1"},
-      {:gviz, path: "~/dev/gviz"},
-      {:makeup_live, path: "~/dev/makeup_live"},
-      {:sketchpad, path: "~/dev/forks/sketchpad"}
+      {:gviz, github: "axelson/dep_viz"},
+      {:makeup_live, github: "axelson/makeup_live_format"},
+      {:sketchpad, github: "axelson/sketchpad"},
+      {:jamroom, github: "axelson/jamroom", branch: "update-phoenix-liveview"}
     ]
   end
 

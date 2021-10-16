@@ -14,6 +14,10 @@ defmodule ProxyWeb.MyProxy do
       %{
         domain: Application.fetch_env!(:proxy, :sketch_domain),
         phoenix_endpoint: SketchpadWeb.Endpoint
+      },
+      %{
+        domain: Application.fetch_env!(:proxy, :jamroom_domain),
+        phoenix_endpoint: JamroomWeb.Endpoint
       }
     ]
 

@@ -16,11 +16,13 @@ config :proxy,
     "pham.jasonaxelson.com",
     "depviz.jasonaxelson.com",
     "makeuplive.jasonaxelson.com",
-    "sketch.jasonaxelson.com"
+    "sketch.jasonaxelson.com",
+    "jamroom.hassanshaikley.jasonaxelson.com"
   ],
   depviz_domain: "depviz.jasonaxelson.com",
   makeuplive_domain: "makeuplive.jasonaxelson.com",
-  sketch_domain: "sketch.jasonaxelson.com"
+  sketch_domain: "sketch.jasonaxelson.com",
+  jamroom_domain: "jamroom.hassanshaikley.jasonaxelson.com"
 
 config :proxy, ProxyWeb.Endpoint,
   url: [host: "pham.jasonaxelson.com", port: 80],
@@ -31,6 +33,7 @@ config :proxy, ProxyWeb.Endpoint,
 config :gviz, GVizWeb.Endpoint,
   url: [host: "depviz.jasonaxelson.com", port: 443],
   hostname: "depviz.jasonaxelson.com",
+  force_ssl: [rewrite_on: [:x_forwarded_proto]],
   check_origin: false,
   root: Path.dirname(__DIR__),
   server: false,
@@ -38,35 +41,43 @@ config :gviz, GVizWeb.Endpoint,
   pubsub_server: GViz.PubSub,
   code_reloader: false
 
-config :gviz, :phoenix_endpoint, GVizWeb.Endpoint
-
-config :gviz, namespace: GViz
-
 config :makeup_live, MakeupLiveWeb.Endpoint,
   url: [host: "makeuplive.jasonaxelson.com", port: 443],
   hostname: "makeuplive.jasonaxelson.com",
-  secret_key_base: "BCqHloAfzORpn/TX90PB9GULWVRZpjwegD4U8T1on/RUmEYTjkVGLC2YKFhkhLiS",
-  check_origin: false,
+  force_ssl: [rewrite_on: [:x_forwarded_proto]],
+  # check_origin: false,
   root: Path.dirname(__DIR__),
   render_errors: [view: MakeupLiveWeb.ErrorView, accepts: ~w(html json)],
   pubsub_server: MakeupLive.PubSub,
-  server: false,
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
-  cache_static_manifest: "priv/static/cache_manifest.json"
+  cache_static_manifest: "priv/static/cache_manifest.json",
+  server: false
 
 config :sketchpad, SketchpadWeb.Endpoint,
-  url: [host: "sketch.jasonaxelson.com", port: 80],
+  url: [host: "sketch.jasonaxelson.com", port: 443],
   hostname: "sketch.jasonaxelson.com",
-  secret_key_base: "BCqHloAfzORpn/TX90PB9GULWVRZpjwegD4U8T1on/RUmEYTjkVGLC2YKFhkhLiS",
+  force_ssl: [rewrite_on: [:x_forwarded_proto]],
   render_errors: [view: SketchpadWeb.ErrorView, accepts: ~w(html json)],
-  check_origin: false,
+  # check_origin: false,
   root: Path.dirname(__DIR__),
-  render_errors: [view: MakeupLiveWeb.ErrorView, accepts: ~w(html json)],
-  pubsub_server: MakeupLive.PubSub,
-  server: false,
   cache_static_manifest: "priv/static/cache_manifest.json",
   pubsub_server: Sketchpad.PubSub,
+  code_reloader: false,
+  server: false
+
+config :jamroom, JamroomWeb.Endpoint,
+  url: [host: "jamroom.hassanshaikley.jasonaxelson.com", port: 443],
+  hostname: "jamroom.hassanshaikley.jasonaxelson.com",
+  force_ssl: [rewrite_on: [:x_forwarded_proto]],
+  root: Path.dirname(__DIR__),
+  server: false,
+  render_errors: [view: JamroomWeb.ErrorView, accepts: ~w(html json), layout: false],
+  pubsub_server: Jamroom.InternalPubSub,
   code_reloader: false
+
+config :gviz, :phoenix_endpoint, GVizWeb.Endpoint
+
+config :gviz, namespace: GViz
 
 # Use shoehorn to start the main application. See the shoehorn
 # docs for separating out critical OTP applications such as those
