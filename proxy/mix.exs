@@ -43,7 +43,7 @@ defmodule Proxy.MixProject do
       {:gviz, github: "axelson/dep_viz"},
       {:makeup_live, github: "axelson/makeup_live_format"},
       {:sketchpad, github: "axelson/sketchpad"},
-      {:jamroom, github: "axelson/jamroom", branch: "update-phoenix-liveview"}
+      {:jamroom, github: "hassanshaikley/jamroom"}
     ]
   end
 

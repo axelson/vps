@@ -23,7 +23,7 @@ config :proxy,
   depviz_domain: "depviz.test",
   makeuplive_domain: "makeuplive.test",
   sketch_domain: "sketch.test",
-  jamroom_domain: "jamroom.hassanshaikley.jasonaxelson.com"
+  jamroom_domain: "jamroom.hassanshaikley.jasonaxelson.com",
   site_encrypt_internal_port: 4106
 
 config :master_proxy,
