@@ -67,3 +67,13 @@ Then you can open the following in a web browser:
 
 Note: you can change the port away from the default of 4102 by setting `config
 :master_proxy, http: [:inet6, port: <a new port>]`
+
+In your `~/.ssh/config` file I recommend setting:
+
+``` ssh-config
+Host vultr
+HostName <your-vultr-server-ip-address>
+```
+
+Maybe try this locally (nginx SSL passthrough)
+https://sxi.io/how-to-configure-nginx-ssl-tls-passthrough-with-tcp-load-balancing/

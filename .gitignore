@@ -29,3 +29,4 @@ fw-*.tar
 # this depending on your deployment strategy.
 /priv/static/
 /tmp
+/backup
