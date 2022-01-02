@@ -72,7 +72,7 @@ defmodule Vps.MixProject do
       cookie: "#{@app}_cookie",
       include_erts: &Nerves.Release.erts/0,
       steps: [&Nerves.Release.init/1, :assemble],
-      strip_beams: Mix.env() == :prod,
+      strip_beams: Mix.env() == :prod or [keep: ["Docs", "Dbgi"]],
       config_providers: [{Vps.RuntimeConfigProvider, "/data/.target.secret.exs"}]
     ]
   end
