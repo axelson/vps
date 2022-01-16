@@ -1,4 +1,4 @@
-defmodule Fw.Application do
+defmodule Vps.Application do
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
   @moduledoc false
@@ -6,15 +6,15 @@ defmodule Fw.Application do
   use Application
 
   def start(_type, _args) do
-    opts = [strategy: :one_for_one, name: Fw.Supervisor]
+    opts = [strategy: :one_for_one, name: Vps.Supervisor]
 
     children =
       List.flatten([
         # Children for all targets
-        FwWeb.Telemetry,
-        {Phoenix.PubSub, name: Fw.PubSub},
-        {SiteEncrypt.Phoenix, FwWeb.Endpoint},
-        FwWeb.MyFw,
+        VpsWeb.Telemetry,
+        {Phoenix.PubSub, name: Vps.PubSub},
+        {SiteEncrypt.Phoenix, VpsWeb.Endpoint},
+        VpsWeb.MyVps,
         children(target())
       ])
 
@@ -25,27 +25,27 @@ defmodule Fw.Application do
   def children(:host) do
     [
       # Children that only run on the host
-      # Starts a worker by calling: Fw.Worker.start_link(arg)
-      # {Fw.Worker, arg},
+      # Starts a worker by calling: Vps.Worker.start_link(arg)
+      # {Vps.Worker, arg},
     ]
   end
 
   def children(_target) do
     [
       # Children for all targets except host
-      # Starts a worker by calling: Fw.Worker.start_link(arg)
-      # {Fw.Worker, arg},
+      # Starts a worker by calling: Vps.Worker.start_link(arg)
+      # {Vps.Worker, arg},
     ]
   end
 
   def target() do
-    Application.get_env(:fw, :target)
+    Application.get_env(:vps, :target)
   end
 
   # Tell Phoenix to update the endpoint configuration
   # whenever the application is updated.
   def config_change(changed, _new, removed) do
-    FwWeb.Endpoint.config_change(changed, removed)
+    VpsWeb.Endpoint.config_change(changed, removed)
     :ok
   end
 end

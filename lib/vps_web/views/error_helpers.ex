@@ -1,4 +1,4 @@
-defmodule FwWeb.ErrorHelpers do
+defmodule VpsWeb.ErrorHelpers do
   @moduledoc """
   Conveniences for translating and building error messages.
   """

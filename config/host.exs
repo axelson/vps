@@ -5,7 +5,7 @@ makeuplive_domain = "makeuplive.localhost"
 sketch_domain = "sketch.localhost"
 jamroom_domain = "jamroom.localhost"
 
-config :fw,
+config :vps,
   cert_mode: "local",
   site_encrypt_domains: [
     "pham.test",
@@ -14,14 +14,14 @@ config :fw,
     sketch_domain,
     jamroom_domain
   ],
-  site_encrypt_db_folder: Path.join([System.get_env("HOME"), "dev/vps/fw/tmp"]),
+  site_encrypt_db_folder: Path.join([System.get_env("HOME"), "dev/vps/vps/tmp"]),
   depviz_domain: depviz_domain,
   makeuplive_domain: makeuplive_domain,
   sketch_domain: sketch_domain,
   jamroom_domain: jamroom_domain,
   site_encrypt_internal_port: 4106
 
-config :fw, FwWeb.Endpoint,
+config :vps, VpsWeb.Endpoint,
   debug_errors: true,
   code_reloader: true,
   check_origin: false,

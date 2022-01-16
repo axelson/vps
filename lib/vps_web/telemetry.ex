@@ -1,4 +1,4 @@
-defmodule FwWeb.Telemetry do
+defmodule VpsWeb.Telemetry do
   use Supervisor
   import Telemetry.Metrics
 
@@ -42,7 +42,7 @@ defmodule FwWeb.Telemetry do
     [
       # A module, function and arguments to be invoked periodically.
       # This function must call :telemetry.execute/3 and a metric must be added above.
-      # {FwWeb, :count_users, []}
+      # {VpsWeb, :count_users, []}
     ]
   end
 end

@@ -1,7 +1,7 @@
-defmodule Fw.MixProject do
+defmodule Vps.MixProject do
   use Mix.Project
 
-  @app :fw
+  @app :vps
   @version "0.1.0"
   @all_targets [:rpi, :rpi0, :rpi2, :rpi3, :rpi3a, :rpi4, :bbb, :osd32mp1, :x86_64, :vultr]
 
@@ -25,7 +25,7 @@ defmodule Fw.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      mod: {Fw.Application, []},
+      mod: {Vps.Application, []},
       extra_applications: [:logger, :runtime_tools]
     ]
   end
@@ -37,6 +37,8 @@ defmodule Fw.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:rename, "~> 0.1.0", only: :dev},
+
       # Dependencies for all targets
       {:nerves, "~> 1.7.0", runtime: false},
       {:shoehorn, "~> 0.8.0"},
@@ -71,7 +73,7 @@ defmodule Fw.MixProject do
       include_erts: &Nerves.Release.erts/0,
       steps: [&Nerves.Release.init/1, :assemble],
       strip_beams: Mix.env() == :prod,
-      config_providers: [{Fw.RuntimeConfigProvider, "/data/.target.secret.exs"}]
+      config_providers: [{Vps.RuntimeConfigProvider, "/data/.target.secret.exs"}]
     ]
   end
 

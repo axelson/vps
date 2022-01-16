@@ -1,6 +1,6 @@
-defmodule Fw do
+defmodule Vps do
   @moduledoc """
-  Documentation for Fw.
+  Documentation for Vps.
   """
 
   @doc """
@@ -8,7 +8,7 @@ defmodule Fw do
 
   ## Examples
 
-      iex> Fw.hello
+      iex> Vps.hello
       :world
 
   """

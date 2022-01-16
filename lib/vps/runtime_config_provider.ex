@@ -1,4 +1,4 @@
-defmodule Fw.RuntimeConfigProvider do
+defmodule Vps.RuntimeConfigProvider do
   @behaviour Config.Provider
   # NOTE: Logger messages are not used here because they are not being reported by RingLogger
 

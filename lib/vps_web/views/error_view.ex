@@ -1,5 +1,5 @@
-defmodule FwWeb.ErrorView do
-  use FwWeb, :view
+defmodule VpsWeb.ErrorView do
+  use VpsWeb, :view
 
   # If you want to customize a particular status code
   # for a certain format, you may uncomment below.

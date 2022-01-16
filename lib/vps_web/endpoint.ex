@@ -1,5 +1,5 @@
-defmodule FwWeb.Endpoint do
-  use Phoenix.Endpoint, otp_app: :fw
+defmodule VpsWeb.Endpoint do
+  use Phoenix.Endpoint, otp_app: :vps
   use SiteEncrypt.Phoenix
 
   # The session will be stored in the cookie and signed,
@@ -7,11 +7,11 @@ defmodule FwWeb.Endpoint do
   # Set :encryption_salt if you would also like to encrypt it.
   @session_options [
     store: :cookie,
-    key: "_fw_key",
+    key: "_vps_key",
     signing_salt: "qag42CRh"
   ]
 
-  socket("/socket", FwWeb.UserSocket,
+  socket("/socket", VpsWeb.UserSocket,
     websocket: true,
     longpoll: false
   )
@@ -22,7 +22,7 @@ defmodule FwWeb.Endpoint do
   # when deploying your static files in production.
   plug(Plug.Static,
     at: "/",
-    from: :fw,
+    from: :vps,
     gzip: false,
     only: ~w(css fonts images js favicon.ico robots.txt)
   )
@@ -45,7 +45,7 @@ defmodule FwWeb.Endpoint do
   plug(Plug.MethodOverride)
   plug(Plug.Head)
   plug(Plug.Session, @session_options)
-  plug(FwWeb.Router)
+  plug(VpsWeb.Router)
 
   @impl Phoenix.Endpoint
   def init(_key, config) do
@@ -55,16 +55,16 @@ defmodule FwWeb.Endpoint do
 
   def certification do
     SiteEncrypt.configure(
-      # id: FwWeb.Endpoint,
-      # callback: FwWeb.SiteEncryptImpl,
+      # id: VpsWeb.Endpoint,
+      # callback: VpsWeb.SiteEncryptImpl,
       client: :native,
-      domains: Application.fetch_env!(:fw, :site_encrypt_domains),
+      domains: Application.fetch_env!(:vps, :site_encrypt_domains),
       emails: ["contact@jasonaxelson.com"],
-      db_folder: Application.fetch_env!(:fw, :site_encrypt_db_folder),
+      db_folder: Application.fetch_env!(:vps, :site_encrypt_db_folder),
       directory_url:
-        case Application.get_env(:fw, :cert_mode, "local") do
+        case Application.get_env(:vps, :cert_mode, "local") do
           "local" ->
-            {:internal, port: Application.fetch_env!(:fw, :site_encrypt_internal_port)}
+            {:internal, port: Application.fetch_env!(:vps, :site_encrypt_internal_port)}
 
           "staging" ->
             "https://acme-staging-v02.api.letsencrypt.org/directory"
