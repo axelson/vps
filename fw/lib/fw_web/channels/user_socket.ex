@@ -1,8 +1,8 @@
-defmodule ProxyWeb.UserSocket do
+defmodule FwWeb.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-  # channel "room:*", ProxyWeb.RoomChannel
+  # channel "room:*", FwWeb.RoomChannel
 
   # Socket params are passed from the client and can
   # be used to verify and authenticate a user. After
@@ -27,7 +27,7 @@ defmodule ProxyWeb.UserSocket do
   # Would allow you to broadcast a "disconnect" event and terminate
   # all active sockets and channels for a given user:
   #
-  #     ProxyWeb.Endpoint.broadcast("user_socket:#{user.id}", "disconnect", %{})
+  #     FwWeb.Endpoint.broadcast("user_socket:#{user.id}", "disconnect", %{})
   #
   # Returning `nil` makes this socket anonymous.
   @impl true

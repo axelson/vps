@@ -1,5 +1,5 @@
-defmodule ProxyWeb.ErrorView do
-  use ProxyWeb, :view
+defmodule FwWeb.ErrorView do
+  use FwWeb, :view
 
   # If you want to customize a particular status code
   # for a certain format, you may uncomment below.

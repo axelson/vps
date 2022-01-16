@@ -10,9 +10,12 @@ defmodule Fw.MixProject do
       app: @app,
       version: @version,
       elixir: "~> 1.9",
+      elixirc_paths: elixirc_paths(Mix.env()),
+      compilers: [:phoenix] ++ Mix.compilers(),
       archives: [nerves_bootstrap: "~> 1.10"],
       start_permanent: Mix.env() == :prod,
       build_embedded: true,
+      aliases: aliases(),
       deps: deps(),
       releases: [{@app, release()}],
       preferred_cli_target: [run: :host, test: :host]
@@ -27,6 +30,10 @@ defmodule Fw.MixProject do
     ]
   end
 
+  # Specifies which paths to compile per environment.
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
+
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
@@ -35,7 +42,17 @@ defmodule Fw.MixProject do
       {:shoehorn, "~> 0.8.0"},
       {:ring_logger, "~> 0.8.1"},
       {:toolshed, "~> 0.2.13"},
-      {:proxy, path: "../proxy"},
+      {:phoenix, "~> 1.6.0"},
+      {:telemetry_metrics, "~> 0.4"},
+      {:telemetry_poller, "~> 0.4"},
+      {:jason, "~> 1.0"},
+      {:plug_cowboy, "~> 2.0"},
+      {:site_encrypt, "~> 0.4"},
+      {:master_proxy, github: "axelson/master_proxy", branch: "flexiblity-1"},
+      {:gviz, github: "axelson/dep_viz"},
+      {:makeup_live, github: "axelson/makeup_live_format"},
+      {:sketchpad, github: "axelson/sketchpad"},
+      {:jamroom, github: "hassanshaikley/jamroom"},
 
       # Dependencies for all targets except :host
       {:nerves_runtime, "~> 0.11.3", targets: @all_targets},
@@ -55,6 +72,12 @@ defmodule Fw.MixProject do
       steps: [&Nerves.Release.init/1, :assemble],
       strip_beams: Mix.env() == :prod,
       config_providers: [{Fw.RuntimeConfigProvider, "/data/.target.secret.exs"}]
+    ]
+  end
+
+  defp aliases do
+    [
+      setup: ["deps.get"]
     ]
   end
 end

@@ -1,12 +1,12 @@
-defmodule ProxyWeb do
+defmodule FwWeb do
   @moduledoc """
   The entrypoint for defining your web interface, such
   as controllers, views, channels and so on.
 
   This can be used in your application as:
 
-      use ProxyWeb, :controller
-      use ProxyWeb, :view
+      use FwWeb, :controller
+      use FwWeb, :view
 
   The definitions below will be executed for every view,
   controller, etc, so keep them short and clean, focused
@@ -19,18 +19,18 @@ defmodule ProxyWeb do
 
   def controller do
     quote do
-      use Phoenix.Controller, namespace: ProxyWeb
+      use Phoenix.Controller, namespace: FwWeb
 
       import Plug.Conn
-      alias ProxyWeb.Router.Helpers, as: Routes
+      alias FwWeb.Router.Helpers, as: Routes
     end
   end
 
   def view do
     quote do
       use Phoenix.View,
-        root: "lib/proxy_web/templates",
-        namespace: ProxyWeb
+        root: "lib/fw_web/templates",
+        namespace: FwWeb
 
       # Import convenience functions from controllers
       import Phoenix.Controller,
@@ -61,8 +61,8 @@ defmodule ProxyWeb do
       # Import basic rendering functionality (render, render_layout, etc)
       import Phoenix.View
 
-      import ProxyWeb.ErrorHelpers
-      alias ProxyWeb.Router.Helpers, as: Routes
+      import FwWeb.ErrorHelpers
+      alias FwWeb.Router.Helpers, as: Routes
     end
   end
 

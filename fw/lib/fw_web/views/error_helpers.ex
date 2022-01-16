@@ -1,4 +1,4 @@
-defmodule ProxyWeb.ErrorHelpers do
+defmodule FwWeb.ErrorHelpers do
   @moduledoc """
   Conveniences for translating and building error messages.
   """

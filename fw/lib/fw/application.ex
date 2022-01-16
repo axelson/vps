@@ -6,16 +6,17 @@ defmodule Fw.Application do
   use Application
 
   def start(_type, _args) do
-    # See https://hexdocs.pm/elixir/Supervisor.html
-    # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Fw.Supervisor]
 
     children =
-      [
+      List.flatten([
         # Children for all targets
-        # Starts a worker by calling: Fw.Worker.start_link(arg)
-        # {Fw.Worker, arg},
-      ] ++ children(target())
+        FwWeb.Telemetry,
+        {Phoenix.PubSub, name: Fw.PubSub},
+        {SiteEncrypt.Phoenix, FwWeb.Endpoint},
+        FwWeb.MyFw,
+        children(target())
+      ])
 
     Supervisor.start_link(children, opts)
   end
@@ -39,5 +40,12 @@ defmodule Fw.Application do
 
   def target() do
     Application.get_env(:fw, :target)
+  end
+
+  # Tell Phoenix to update the endpoint configuration
+  # whenever the application is updated.
+  def config_change(changed, _new, removed) do
+    FwWeb.Endpoint.config_change(changed, removed)
+    :ok
   end
 end

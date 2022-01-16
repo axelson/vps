@@ -1,5 +1,5 @@
-defmodule ProxyWeb.Endpoint do
-  use Phoenix.Endpoint, otp_app: :proxy
+defmodule FwWeb.Endpoint do
+  use Phoenix.Endpoint, otp_app: :fw
   use SiteEncrypt.Phoenix
 
   # The session will be stored in the cookie and signed,
@@ -7,42 +7,45 @@ defmodule ProxyWeb.Endpoint do
   # Set :encryption_salt if you would also like to encrypt it.
   @session_options [
     store: :cookie,
-    key: "_proxy_key",
+    key: "_fw_key",
     signing_salt: "qag42CRh"
   ]
 
-  socket "/socket", ProxyWeb.UserSocket,
+  socket("/socket", FwWeb.UserSocket,
     websocket: true,
     longpoll: false
+  )
 
   # Serve at "/" the static files from "priv/static" directory.
   #
   # You should set gzip to true if you are running phx.digest
   # when deploying your static files in production.
-  plug Plug.Static,
+  plug(Plug.Static,
     at: "/",
-    from: :proxy,
+    from: :fw,
     gzip: false,
     only: ~w(css fonts images js favicon.ico robots.txt)
+  )
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
   if code_reloading? do
-    plug Phoenix.CodeReloader
+    plug(Phoenix.CodeReloader)
   end
 
-  plug Plug.RequestId
-  plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
+  plug(Plug.RequestId)
+  plug(Plug.Telemetry, event_prefix: [:phoenix, :endpoint])
 
-  plug Plug.Parsers,
+  plug(Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
     json_decoder: Phoenix.json_library()
+  )
 
-  plug Plug.MethodOverride
-  plug Plug.Head
-  plug Plug.Session, @session_options
-  plug ProxyWeb.Router
+  plug(Plug.MethodOverride)
+  plug(Plug.Head)
+  plug(Plug.Session, @session_options)
+  plug(FwWeb.Router)
 
   @impl Phoenix.Endpoint
   def init(_key, config) do
@@ -52,16 +55,16 @@ defmodule ProxyWeb.Endpoint do
 
   def certification do
     SiteEncrypt.configure(
-      # id: ProxyWeb.Endpoint,
-      # callback: ProxyWeb.SiteEncryptImpl,
+      # id: FwWeb.Endpoint,
+      # callback: FwWeb.SiteEncryptImpl,
       client: :native,
-      domains: Application.fetch_env!(:proxy, :site_encrypt_domains),
+      domains: Application.fetch_env!(:fw, :site_encrypt_domains),
       emails: ["contact@jasonaxelson.com"],
-      db_folder: Application.fetch_env!(:proxy, :site_encrypt_db_folder),
+      db_folder: Application.fetch_env!(:fw, :site_encrypt_db_folder),
       directory_url:
-        case Application.get_env(:proxy, :cert_mode, "local") do
+        case Application.get_env(:fw, :cert_mode, "local") do
           "local" ->
-            {:internal, port: Application.fetch_env!(:proxy, :site_encrypt_internal_port)}
+            {:internal, port: Application.fetch_env!(:fw, :site_encrypt_internal_port)}
 
           "staging" ->
             "https://acme-staging-v02.api.letsencrypt.org/directory"
