@@ -44,7 +44,7 @@ defmodule Vps.MixProject do
       {:toolshed, "~> 0.2.13"},
       {:phoenix, "~> 1.6.0"},
       {:telemetry_metrics, "~> 0.4"},
-      {:telemetry_poller, "~> 0.4"},
+      {:telemetry_poller, "~> 1.0"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:site_encrypt, "~> 0.4"},
@@ -52,7 +52,9 @@ defmodule Vps.MixProject do
       {:gviz, github: "axelson/dep_viz"},
       {:makeup_live, github: "axelson/makeup_live_format"},
       {:sketchpad, github: "axelson/sketchpad"},
-      {:jamroom, github: "hassanshaikley/jamroom"},
+      # https://github.com/hassanshaikley/jamroom/pull/11
+      {:jamroom, github: "axelson/jamroom", branch: "update-dependencies"},
+      # {:jamroom, github: "hassanshaikley/jamroom"},
 
       # Dependencies for all targets except :host
       {:nerves_runtime, "~> 0.11.3", targets: @all_targets},

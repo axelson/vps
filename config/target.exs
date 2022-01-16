@@ -1,15 +1,6 @@
 import Config
 
-config :logger,
-  backends: [RingLogger]
-
-config :master_proxy,
-  http: [:inet6, port: 80],
-  https: [:inet6, port: 443]
-
-config :site_encrypt, sites: [{ProxyWeb.Endpoint, ProxyWeb.SiteEncryptImpl}]
-
-config :proxy,
+config :vps,
   cert_mode: "production",
   site_encrypt_db_folder: Path.join(~w[/data site_encrypt]),
   site_encrypt_domains: [
@@ -24,10 +15,10 @@ config :proxy,
   sketch_domain: "sketch.jasonaxelson.com",
   jamroom_domain: "jamroom.hassanshaikley.jasonaxelson.com"
 
-config :proxy, ProxyWeb.Endpoint,
+config :vps, VpsWeb.Endpoint,
   url: [host: "pham.jasonaxelson.com", port: 80],
-  render_errors: [view: ProxyWeb.ErrorView, accepts: ~w(json), layout: false],
-  pubsub_server: Proxy.PubSub,
+  render_errors: [view: VpsWeb.ErrorView, accepts: ~w(json), layout: false],
+  pubsub_server: Vps.PubSub,
   server: false
 
 config :gviz, GVizWeb.Endpoint,
@@ -143,6 +134,15 @@ config :vintage_net,
      }},
     {"wlan0", %{type: VintageNetWiFi}}
   ]
+
+config :master_proxy,
+  http: [:inet6, port: 80],
+  https: [:inet6, port: 443]
+
+config :site_encrypt, sites: [{VpsWeb.Endpoint, VpsWeb.SiteEncryptImpl}]
+
+config :logger,
+  backends: [RingLogger]
 
 # config :mdns_lite,
 #  # The `host` key specifies what hostnames mdns_lite advertises.  `:hostname`
