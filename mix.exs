@@ -37,8 +37,6 @@ defmodule Vps.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:rename, "~> 0.1.0", only: :dev},
-
       # Dependencies for all targets
       {:nerves, "~> 1.7.0", runtime: false},
       {:shoehorn, "~> 0.8.0"},
