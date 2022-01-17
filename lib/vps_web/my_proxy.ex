@@ -1,4 +1,4 @@
-defmodule VpsWeb.MyVps do
+defmodule VpsWeb.MyProxy do
   use MasterProxy,
     backends: [
       # Needed for site_encrypt
