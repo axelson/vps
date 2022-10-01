@@ -77,3 +77,7 @@ HostName <your-vultr-server-ip-address>
 
 Maybe try this locally (nginx SSL passthrough)
 https://sxi.io/how-to-configure-nginx-ssl-tls-passthrough-with-tcp-load-balancing/
+
+# Deployment
+
+See the [Development instructions](./DEVELOPMENT.md)
