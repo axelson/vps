@@ -30,3 +30,6 @@ fw-*.tar
 /priv/static/
 /tmp
 /backup
+
+# Certs from SiteEncrypt get stored here when running in host mode
+/vps/tmp
