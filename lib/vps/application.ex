@@ -15,7 +15,8 @@ defmodule Vps.Application do
         {Phoenix.PubSub, name: Vps.PubSub},
         {SiteEncrypt.Phoenix, VpsWeb.Endpoint},
         VpsWeb.MyProxy,
-        children(target())
+        children(target()),
+        Vps.StartupLogger
       ])
 
     Supervisor.start_link(children, opts)
@@ -47,5 +48,32 @@ defmodule Vps.Application do
   def config_change(changed, _new, removed) do
     VpsWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+end
+
+defmodule Vps.StartupLogger do
+  use GenServer
+  require Logger
+
+  def start_link(opts \\ []) do
+    GenServer.start_link(__MODULE__, opts, name: __MODULE__)
+  end
+
+  def init(_) do
+    Logger.info(
+      "VPS Started up. Listening on ports #{inspect(http_port())} and #{inspect(https_port())}"
+    )
+
+    {:ok, []}
+  end
+
+  defp http_port do
+    scheme_opts = Application.get_env(:master_proxy, :http, [])
+    :proplists.get_value(:port, scheme_opts)
+  end
+
+  defp https_port do
+    scheme_opts = Application.get_env(:master_proxy, :https, [])
+    :proplists.get_value(:port, scheme_opts)
   end
 end

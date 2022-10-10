@@ -18,6 +18,9 @@ defmodule VpsWeb.MyProxy do
       %{
         domain: Application.fetch_env!(:vps, :jamroom_domain),
         phoenix_endpoint: JamroomWeb.Endpoint
+      },
+      %{
+        plug: VpsWeb.DefaultPlug
       }
     ]
 

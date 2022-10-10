@@ -6,6 +6,7 @@ sketch_domain = "sketch.localhost"
 jamroom_domain = "jamroom.localhost"
 
 config :vps,
+  http_mode: :http,
   cert_mode: "local",
   site_encrypt_domains: [
     "pham.test",
@@ -85,7 +86,7 @@ config :jamroom, JamroomWeb.Endpoint,
   code_reloader: false
 
 config :master_proxy,
-  http: [:inet6, port: 4102],
+  http: [:inet6, port: 4000],
   https: [:inet6, port: 4103]
 
 # Configures Elixir's Logger

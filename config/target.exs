@@ -1,6 +1,7 @@
 import Config
 
 config :vps,
+  http_mode: :https,
   cert_mode: "production",
   site_encrypt_db_folder: Path.join(~w[/data site_encrypt]),
   site_encrypt_domains: [
@@ -69,6 +70,12 @@ config :jamroom, JamroomWeb.Endpoint,
 config :gviz, :phoenix_endpoint, GVizWeb.Endpoint
 
 config :gviz, namespace: GViz
+
+# Use Ringlogger as the logger backend and remove :console.
+# See https://hexdocs.pm/ring_logger/readme.html for more information on
+# configuring ring_logger.
+
+config :logger, backends: [RingLogger]
 
 # Use shoehorn to start the main application. See the shoehorn
 # docs for separating out critical OTP applications such as those
