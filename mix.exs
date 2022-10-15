@@ -52,9 +52,7 @@ defmodule Vps.MixProject do
       {:gviz, github: "axelson/dep_viz"},
       {:makeup_live, github: "axelson/makeup_live_format"},
       {:sketchpad, github: "axelson/sketchpad"},
-      # https://github.com/hassanshaikley/jamroom/pull/11
-      {:jamroom, github: "axelson/jamroom", branch: "update-dependencies"},
-      # {:jamroom, github: "hassanshaikley/jamroom"},
+      {:jamroom, github: "axelson/jamroom"},
 
       # Dependencies for all targets except :host
       {:nerves_runtime, "~> 0.13.0", targets: @all_targets},
