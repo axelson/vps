@@ -18,6 +18,8 @@ config :vps,
   site_encrypt_db_folder: Path.join([System.get_env("HOME"), "dev/vps/vps/tmp"]),
   site_encrypt_internal_port: 4106
 
+config :vps, Vps.Repo, database: "priv/database.db"
+
 config :vps, VpsWeb.Endpoint,
   debug_errors: true,
   code_reloader: true,

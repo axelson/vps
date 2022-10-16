@@ -8,6 +8,8 @@ defmodule VpsWeb.Telemetry do
 
   @impl true
   def init(_arg) do
+    attach([:main_proxy, :request, :done], &__MODULE__.log_main_proxy_request/4)
+
     children = [
       # Telemetry poller will execute the given period measurements
       # every 10_000ms. Learn more here: https://hexdocs.pm/telemetry_metrics
@@ -17,6 +19,15 @@ defmodule VpsWeb.Telemetry do
     ]
 
     Supervisor.init(children, strategy: :one_for_one)
+  end
+
+  def attach(event, fun) when is_function(fun) do
+    :telemetry.attach(
+      {__MODULE__, event},
+      event,
+      fun,
+      :ok
+    )
   end
 
   def metrics do
@@ -44,5 +55,27 @@ defmodule VpsWeb.Telemetry do
       # This function must call :telemetry.execute/3 and a metric must be added above.
       # {VpsWeb, :count_users, []}
     ]
+  end
+
+  def log_main_proxy_request(_, %{duration: duration}, metadata, _) do
+    duration_ms = System.convert_time_unit(duration, :native, :millisecond)
+
+    plug = get_in(metadata, [:result, :plug])
+
+    unless is_uptime_robot?(metadata) do
+      Task.start(fn ->
+        Vps.Repo.insert(%Vps.Hit{
+          plug: inspect(plug),
+          duration: duration_ms
+        })
+      end)
+    end
+
+    :ok
+  end
+
+  defp is_uptime_robot?(metadata) do
+    user_agent = get_in(metadata, [:req, :user_agent])
+    is_binary(user_agent) && String.contains?(user_agent, "uptimerobot")
   end
 end

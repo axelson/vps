@@ -17,6 +17,8 @@ config :vps,
   site_encrypt_db_folder: Path.join(~w[/data site_encrypt]),
   site_encrypt_domains: ["pham.jasonaxelson.com"] ++ domains
 
+config :vps, Vps.Repo, database: "/data/vps.db"
+
 config :vps, VpsWeb.Endpoint,
   url: [host: "pham.jasonaxelson.com", port: 80],
   render_errors: [view: VpsWeb.ErrorView, accepts: ~w(json), layout: false],

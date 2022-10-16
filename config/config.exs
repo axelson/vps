@@ -8,7 +8,9 @@ import Config
 # Enable the Nerves integration with Mix
 Application.start(:nerves_bootstrap)
 
-config :vps, target: Mix.target()
+config :vps,
+  target: Mix.target(),
+  ecto_repos: [Vps.Repo]
 
 # Customize non-Elixir parts of the firmware. See
 # https://hexdocs.pm/nerves/advanced-configuration.html for details.

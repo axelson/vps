@@ -13,6 +13,7 @@ defmodule Vps.Application do
         # Children for all targets
         VpsWeb.Telemetry,
         {Phoenix.PubSub, name: Vps.PubSub},
+        Vps.Repo,
         {SiteEncrypt.Phoenix, VpsWeb.Endpoint},
         VpsWeb.MyProxy,
         children(target()),
