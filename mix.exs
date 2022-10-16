@@ -48,7 +48,7 @@ defmodule Vps.MixProject do
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.0"},
       {:site_encrypt, "~> 0.4"},
-      {:master_proxy, github: "axelson/master_proxy", branch: "flexiblity-1"},
+      {:main_proxy, "~> 0.2.0"},
       {:gviz, github: "axelson/dep_viz"},
       {:makeup_live, github: "axelson/makeup_live_format"},
       {:sketchpad, github: "axelson/sketchpad"},

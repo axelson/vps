@@ -1,34 +1,32 @@
 defmodule VpsWeb.MyProxy do
-  use MasterProxy,
-    backends: [
+  use MainProxy.Proxy
+
+  @impl MainProxy.Proxy
+  def backends do
+    site_configurations =
+      Application.fetch_env!(:vps, :endpoint_configs)
+      |> Enum.map(fn {_app, endpoint, hostname} ->
+        %{
+          domain: hostname,
+          phoenix_endpoint: endpoint
+        }
+      end)
+
+    List.flatten([
       # Needed for site_encrypt
       %{path: ~r/^\/.well-known\/acme-challenge\//, phoenix_endpoint: VpsWeb.Endpoint},
-      %{
-        domain: Application.fetch_env!(:vps, :depviz_domain),
-        phoenix_endpoint: GVizWeb.Endpoint
-      },
-      %{
-        domain: Application.fetch_env!(:vps, :makeuplive_domain),
-        phoenix_endpoint: MakeupLiveWeb.Endpoint
-      },
-      %{
-        domain: Application.fetch_env!(:vps, :sketch_domain),
-        phoenix_endpoint: SketchpadWeb.Endpoint
-      },
-      %{
-        domain: Application.fetch_env!(:vps, :jamroom_domain),
-        phoenix_endpoint: JamroomWeb.Endpoint
-      },
+      site_configurations,
       %{
         plug: VpsWeb.DefaultPlug
       }
-    ]
+    ])
+  end
 
   # Optional callback
-  @impl MasterProxy
+  @impl MainProxy.Proxy
   def merge_config(:https, opts) do
     Config.Reader.merge(opts, SiteEncrypt.https_keys(VpsWeb.Endpoint))
   end
 
-  def merge_config(:http, opts), do: opts
+  def merge_config(_, opts), do: opts
 end

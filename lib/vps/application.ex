@@ -68,12 +68,12 @@ defmodule Vps.StartupLogger do
   end
 
   defp http_port do
-    scheme_opts = Application.get_env(:master_proxy, :http, [])
+    scheme_opts = Application.get_env(:main_proxy, :http, [])
     :proplists.get_value(:port, scheme_opts)
   end
 
   defp https_port do
-    scheme_opts = Application.get_env(:master_proxy, :https, [])
+    scheme_opts = Application.get_env(:main_proxy, :https, [])
     :proplists.get_value(:port, scheme_opts)
   end
 end

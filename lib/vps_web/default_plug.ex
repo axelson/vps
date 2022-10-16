@@ -5,18 +5,16 @@ defmodule VpsWeb.DefaultPlug do
 
   def call(conn, _opts) do
     assigns = %{
-      domains:
-        [
-          Application.fetch_env!(:vps, :depviz_domain),
-          Application.fetch_env!(:vps, :makeuplive_domain),
-          Application.fetch_env!(:vps, :sketch_domain),
-          Application.fetch_env!(:vps, :jamroom_domain)
-        ]
-        |> Enum.map(&build_url/1)
+      domains: domains()
     }
 
     html = ~H"""
     <html>
+      <head>
+        <title>
+          VPS
+        </title>
+      </head>
       <body>
         <h2>Available domains:</h2>
         <ul>
@@ -46,14 +44,19 @@ defmodule VpsWeb.DefaultPlug do
     port =
       case http_mode do
         :http ->
-          scheme_opts = Application.get_env(:master_proxy, :http, [])
+          scheme_opts = Application.get_env(:main_proxy, :http, [])
           :proplists.get_value(:port, scheme_opts)
 
         :https ->
-          scheme_opts = Application.get_env(:master_proxy, :https, [])
+          scheme_opts = Application.get_env(:main_proxy, :https, [])
           :proplists.get_value(:port, scheme_opts)
       end
 
     scheme <> domain <> ":" <> to_string(port)
+  end
+
+  defp domains do
+    Enum.map(Application.fetch_env!(:vps, :endpoint_configs), fn {_, _, domain} -> domain end)
+    |> Enum.map(&build_url/1)
   end
 end
