@@ -33,3 +33,5 @@ fw-*.tar
 
 # Certs from SiteEncrypt get stored here when running in host mode
 /vps/tmp
+
+/priv/database.db*

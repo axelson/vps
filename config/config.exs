@@ -8,7 +8,9 @@ import Config
 # Enable the Nerves integration with Mix
 Application.start(:nerves_bootstrap)
 
-config :vps, target: Mix.target()
+config :vps,
+  target: Mix.target(),
+  ecto_repos: [Vps.Repo]
 
 # Customize non-Elixir parts of the firmware. See
 # https://hexdocs.pm/nerves/advanced-configuration.html for details.
@@ -19,12 +21,6 @@ config :nerves, :firmware, rootfs_overlay: "rootfs_overlay"
 # See https://reproducible-builds.org/docs/source-date-epoch/ for more information
 
 config :nerves, source_date_epoch: "1609186422"
-
-# Use Ringlogger as the logger backend and remove :console.
-# See https://hexdocs.pm/ring_logger/readme.html for more information on
-# configuring ring_logger.
-
-config :logger, backends: [RingLogger]
 
 config :phoenix, :json_library, Jason
 

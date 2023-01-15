@@ -9,19 +9,23 @@ It powers the following Phoenix sites:
 - https://depviz.jasonaxelson.com ([git repo](https://github.com/axelson/dep_viz))
 - https://makeuplive.jasonaxelson.com ([git repo](https://github.com/axelson/makeup_live_format/))
 - https://sketch.jasonaxelson.com ([git repo](https://github.com/axelson/sketchpad/))
-- https://jamroom.hassanshaikley.jasonaxelson.com ([git repo](https://github.com/hassanshaikley/jamroom/))
+- https://jamroom.jasonaxelson.com ([git repo](https://github.com/axelson/jamroom/))
+
+I spoke about this at CodeBEAM America 2022: https://codebeamamerica.com/participants/Jason-axelson/
+
+At this time the video is not available, but the slides are available at: https://jasonaxelson.com/talks/codebeam2022
 
 # How does it work?
 
 The base system runs on Vultr via
 [nerves_system_vultr](https://github.com/nerves-project/nerves_system_vultr).
-[MasterProxy](https://github.com/jesseshieh/master_proxy) allows for multiple
+[MainProxy](https://github.com/Main-Proxy/main_proxy) allows for multiple
 Phoenix applications to run on a single BEAM instance on the same port (443 in
 this case). The domain name on the incoming request is what ties a request to a
 specific Phoenix Endpoint.
 
 Note: I'm currently using my own branch, but I plan to re-integrate that into
-master_proxy https://github.com/axelson/master_proxy/tree/flexiblity-1
+main_proxy https://github.com/axelson/main_proxy/tree/flexiblity-1
 
 [Site Encrypt](https://github.com/sasa1977/site_encrypt) provides automated
 https certificate management via LetsEncrypt.
@@ -66,7 +70,7 @@ Then you can open the following in a web browser:
 - http://jamroom.localhost:4102
 
 Note: you can change the port away from the default of 4102 by setting `config
-:master_proxy, http: [:inet6, port: <a new port>]`
+:main_proxy, http: [:inet6, port: <a new port>]`
 
 In your `~/.ssh/config` file I recommend setting:
 

@@ -1,19 +1,23 @@
 import Config
 
+endpoint_configs = [
+  {:gviz, GVizWeb.Endpoint, "depviz.jasonaxelson.com"},
+  {:makeup_live, MakeupLiveWeb.Endpoint, "makeuplive.jasonaxelson.com"},
+  {:sketchpad, SketchpadWeb.Endpoint, "sketch.jasonaxelson.com"},
+  {:jamroom, JamroomWeb.Endpoint, "jamroom.jasonaxelson.com"}
+]
+
+domains = Enum.map(endpoint_configs, fn {_, _, domain} -> domain end)
+
 config :vps,
+  http_mode: :https,
+  port: 443,
+  endpoint_configs: endpoint_configs,
   cert_mode: "production",
   site_encrypt_db_folder: Path.join(~w[/data site_encrypt]),
-  site_encrypt_domains: [
-    "pham.jasonaxelson.com",
-    "depviz.jasonaxelson.com",
-    "makeuplive.jasonaxelson.com",
-    "sketch.jasonaxelson.com",
-    "jamroom.hassanshaikley.jasonaxelson.com"
-  ],
-  depviz_domain: "depviz.jasonaxelson.com",
-  makeuplive_domain: "makeuplive.jasonaxelson.com",
-  sketch_domain: "sketch.jasonaxelson.com",
-  jamroom_domain: "jamroom.hassanshaikley.jasonaxelson.com"
+  site_encrypt_domains: ["pham.jasonaxelson.com"] ++ domains
+
+config :vps, Vps.Repo, database: "/data/vps.db"
 
 config :vps, VpsWeb.Endpoint,
   url: [host: "pham.jasonaxelson.com", port: 80],
@@ -22,8 +26,6 @@ config :vps, VpsWeb.Endpoint,
   server: false
 
 config :gviz, GVizWeb.Endpoint,
-  url: [host: "depviz.jasonaxelson.com", port: 443],
-  hostname: "depviz.jasonaxelson.com",
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
   check_origin: false,
   root: Path.dirname(__DIR__),
@@ -33,8 +35,6 @@ config :gviz, GVizWeb.Endpoint,
   code_reloader: false
 
 config :makeup_live, MakeupLiveWeb.Endpoint,
-  url: [host: "makeuplive.jasonaxelson.com", port: 443],
-  hostname: "makeuplive.jasonaxelson.com",
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
   # check_origin: false,
   root: Path.dirname(__DIR__),
@@ -45,8 +45,6 @@ config :makeup_live, MakeupLiveWeb.Endpoint,
   server: false
 
 config :sketchpad, SketchpadWeb.Endpoint,
-  url: [host: "sketch.jasonaxelson.com", port: 443],
-  hostname: "sketch.jasonaxelson.com",
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
   render_errors: [view: SketchpadWeb.ErrorView, accepts: ~w(html json)],
   # check_origin: false,
@@ -57,8 +55,6 @@ config :sketchpad, SketchpadWeb.Endpoint,
   server: false
 
 config :jamroom, JamroomWeb.Endpoint,
-  url: [host: "jamroom.hassanshaikley.jasonaxelson.com", port: 443],
-  hostname: "jamroom.hassanshaikley.jasonaxelson.com",
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
   root: Path.dirname(__DIR__),
   server: false,
@@ -69,6 +65,12 @@ config :jamroom, JamroomWeb.Endpoint,
 config :gviz, :phoenix_endpoint, GVizWeb.Endpoint
 
 config :gviz, namespace: GViz
+
+# Use Ringlogger as the logger backend and remove :console.
+# See https://hexdocs.pm/ring_logger/readme.html for more information on
+# configuring ring_logger.
+
+config :logger, backends: [RingLogger]
 
 # Use shoehorn to start the main application. See the shoehorn
 # docs for separating out critical OTP applications such as those
@@ -106,6 +108,7 @@ keys =
     Path.join([System.user_home!(), ".ssh", "id_ecdsa.pub"]),
     Path.join([System.user_home!(), ".ssh", "id_ed25519.pub"]),
     Path.join([System.user_home!(), ".ssh", "id_air_laptop.pub"]),
+    Path.join([System.user_home!(), ".ssh", "id_framework_laptop.pub"]),
     Path.join([System.user_home!(), ".ssh", "id_desktop_rsa.pub"])
   ]
   |> Enum.filter(&File.exists?/1)
@@ -135,7 +138,7 @@ config :vintage_net,
     {"wlan0", %{type: VintageNetWiFi}}
   ]
 
-config :master_proxy,
+config :main_proxy,
   http: [:inet6, port: 80],
   https: [:inet6, port: 443]
 
