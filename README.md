@@ -11,6 +11,10 @@ It powers the following Phoenix sites:
 - https://sketch.jasonaxelson.com ([git repo](https://github.com/axelson/sketchpad/))
 - https://jamroom.hassanshaikley.jasonaxelson.com ([git repo](https://github.com/hassanshaikley/jamroom/))
 
+I spoke about this at CodeBEAM America 2022: https://codebeamamerica.com/participants/Jason-axelson/
+
+At this time the video is not available, but the slides are available at: https://jasonaxelson.com/talks/codebeam2022
+
 # How does it work?
 
 The base system runs on Vultr via
