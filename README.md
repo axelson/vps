@@ -9,7 +9,7 @@ It powers the following Phoenix sites:
 - https://depviz.jasonaxelson.com ([git repo](https://github.com/axelson/dep_viz))
 - https://makeuplive.jasonaxelson.com ([git repo](https://github.com/axelson/makeup_live_format/))
 - https://sketch.jasonaxelson.com ([git repo](https://github.com/axelson/sketchpad/))
-- https://jamroom.hassanshaikley.jasonaxelson.com ([git repo](https://github.com/hassanshaikley/jamroom/))
+- https://jamroom.jasonaxelson.com ([git repo](https://github.com/axelson/jamroom/))
 
 I spoke about this at CodeBEAM America 2022: https://codebeamamerica.com/participants/Jason-axelson/
 
