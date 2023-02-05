@@ -140,7 +140,8 @@ config :vintage_net,
 
 config :main_proxy,
   http: [:inet6, port: 80],
-  https: [:inet6, port: 443]
+  https: [:inet6, port: 443],
+  server: true
 
 config :site_encrypt, sites: [{VpsWeb.Endpoint, VpsWeb.SiteEncryptImpl}]
 
