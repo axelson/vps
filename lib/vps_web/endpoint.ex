@@ -51,7 +51,7 @@ defmodule VpsWeb.Endpoint do
   def init(_key, config) do
     # Merge SiteEncrypt configuration
     endpoint_config =
-      SiteEncrypt.Phoenix.configure_https_bandit(config)
+      SiteEncrypt.Phoenix.configure_https(config)
 
     {:ok, endpoint_config}
   end
