@@ -65,7 +65,7 @@
   "ranch": {:hex, :ranch, "1.8.0", "8c7a100a139fd57f17327b6413e4167ac559fbc04ca7448e9be9057311597a1d", [:make, :rebar3], [], "hexpm", "49fbcfd3682fab1f5d109351b61257676da1a2fdbe295904176d5e521a2ddfe5"},
   "ring_logger": {:hex, :ring_logger, "0.8.6", "8159b877f184f6d3b9e72b2dbd08545b1f93b20f73e827234282273e76223e51", [:mix], [{:circular_buffer, "~> 0.4.0", [hex: :circular_buffer, repo: "hexpm", optional: false]}], "hexpm", "f19684a5413ad455422cea10ec164d71de390f42ce6f703c345d87bcb188f315"},
   "shoehorn": {:hex, :shoehorn, "0.9.1", "8e12670024c2942e3c2fdd27cd5a034ee0337ee7c25c37b3ebc2ad482de67199", [:mix], [], "hexpm", "fccd040ac22de9b3cc111bbf78a363832c7210010a3fff4a550fbb2f10de0692"},
-  "site_encrypt": {:git, "https://github.com/axelson/site_encrypt.git", "c5fc376e0159e820612f3c25921563ce0467a5d0", [branch: "support-bandit"]},
+  "site_encrypt": {:git, "https://github.com/axelson/site_encrypt.git", "00b6610afba364d26ce0c514b4cc5849d79d9377", [branch: "support-bandit"]},
   "sketchpad": {:git, "https://github.com/axelson/sketchpad.git", "a80d00712aba0a2298cd6520ac0e143a8939dd55", []},
   "skogsra": {:hex, :skogsra, "2.3.3", "90ea76d98ad749241b31e724ca17ed8aca0202001972aeca3cb834f44027f3ea", [:mix], [{:jason, "~> 1.2", [hex: :jason, repo: "hexpm", optional: true]}, {:yamerl, "~> 0.8", [hex: :yamerl, repo: "hexpm", optional: true]}], "hexpm", "e36880922431d41ac56d6cb4529b0526039a108fb44f8ecc90b517d494b86c28"},
   "ssh_subsystem_fwup": {:hex, :ssh_subsystem_fwup, "0.6.1", "628f8e3795de5f1d0e7b3b55de4248ab0a77ab4c47e3cd282f1dda89d6354a9f", [:mix], [], "hexpm", "babdae337f2dc011ab5478662b4ec850650d7acfb165662ae47f6f0ce8892499"},
