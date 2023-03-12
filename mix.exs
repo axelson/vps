@@ -37,13 +37,13 @@ defmodule Vps.MixProject do
   defp deps do
     [
       # Dependencies for all targets
-      {:nerves, "~> 1.9.0", runtime: false},
+      {:nerves, "~> 1.10.1", runtime: false},
       {:shoehorn, "~> 0.9.1"},
       {:ring_logger, "~> 0.10"},
-      {:toolshed, "~> 0.2.13"},
+      {:toolshed, "~> 0.3"},
       # {:phoenix, "~> 1.7.1", override: true},
       {:phoenix, "~> 1.7.1"},
-      {:ecto_sqlite3, "~> 0.8.2"},
+      {:ecto_sqlite3, "~> 0.9"},
       {:telemetry_metrics, "~> 0.4"},
       {:telemetry_poller, "~> 1.0"},
       {:jason, "~> 1.0"},
