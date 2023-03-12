@@ -50,7 +50,10 @@ defmodule VpsWeb.Endpoint do
   @impl Phoenix.Endpoint
   def init(_key, config) do
     # Merge SiteEncrypt configuration
-    {:ok, SiteEncrypt.Phoenix.configure_https(config)}
+    endpoint_config =
+      SiteEncrypt.Phoenix.configure_https(config)
+
+    {:ok, endpoint_config}
   end
 
   def certification do

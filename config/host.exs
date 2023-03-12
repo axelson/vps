@@ -21,6 +21,7 @@ config :vps,
 config :vps, Vps.Repo, database: "priv/database.db"
 
 config :vps, VpsWeb.Endpoint,
+  adapter: Bandit.PhoenixAdapter,
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
