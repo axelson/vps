@@ -39,9 +39,10 @@ defmodule Vps.MixProject do
       # Dependencies for all targets
       {:nerves, "~> 1.9.0", runtime: false},
       {:shoehorn, "~> 0.9.1"},
-      {:ring_logger, "~> 0.8.1"},
+      {:ring_logger, "~> 0.10"},
       {:toolshed, "~> 0.2.13"},
-      {:phoenix, "1.7.0-rc.2", override: true},
+      # {:phoenix, "~> 1.7.1", override: true},
+      {:phoenix, "~> 1.7.1"},
       {:ecto_sqlite3, "~> 0.8.2"},
       {:telemetry_metrics, "~> 0.4"},
       {:telemetry_poller, "~> 1.0"},
@@ -50,12 +51,12 @@ defmodule Vps.MixProject do
 
       # {:site_encrypt, "~> 0.4"},
       # {:site_encrypt, path: "~/dev/forks/site_encrypt"},
-      {:site_encrypt, github: "axelson/site_encrypt", branch: "support-bandit"},
+      {:site_encrypt, github: "axelson/site_encrypt", branch: "update-deps"},
 
-      # {:main_proxy, "~> 0.2.0"},
+      {:main_proxy, "~> 0.3.0"},
       # {:main_proxy, path: "~/dev/forks/main_proxy"},
       # {:main_proxy, github: "axelson/main_proxy", branch: "add-telemetry"},
-      {:main_proxy, github: "axelson/main_proxy", branch: "ugprade-to-1.7-redux"},
+      # {:main_proxy, github: "axelson/main_proxy", branch: "ugprade-to-1.7-redux"},
       {:exsync, github: "falood/exsync", only: :dev},
 
       # The sub-applications
