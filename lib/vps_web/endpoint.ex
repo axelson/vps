@@ -1,6 +1,5 @@
 defmodule VpsWeb.Endpoint do
-  use Phoenix.Endpoint, otp_app: :vps
-  use SiteEncrypt.Phoenix
+  use SiteEncrypt.Phoenix.Endpoint, otp_app: :vps
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
@@ -46,15 +45,6 @@ defmodule VpsWeb.Endpoint do
   plug(Plug.Head)
   plug(Plug.Session, @session_options)
   plug(VpsWeb.Router)
-
-  @impl Phoenix.Endpoint
-  def init(_key, config) do
-    # Merge SiteEncrypt configuration
-    endpoint_config =
-      SiteEncrypt.Phoenix.configure_https(config)
-
-    {:ok, endpoint_config}
-  end
 
   def certification do
     SiteEncrypt.configure(

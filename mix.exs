@@ -49,9 +49,9 @@ defmodule Vps.MixProject do
       {:jason, "~> 1.0"},
       {:bandit, ">= 0.6.8"},
 
-      # {:site_encrypt, "~> 0.4"},
+      {:site_encrypt, "~> 0.6.0"},
       # {:site_encrypt, path: "~/dev/forks/site_encrypt"},
-      {:site_encrypt, github: "axelson/site_encrypt", branch: "update-deps"},
+      # {:site_encrypt, github: "axelson/site_encrypt", branch: "update-deps"},
 
       {:main_proxy, "~> 0.3.0"},
       # {:main_proxy, path: "~/dev/forks/main_proxy"},

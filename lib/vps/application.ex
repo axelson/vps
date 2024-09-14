@@ -14,7 +14,7 @@ defmodule Vps.Application do
         VpsWeb.Telemetry,
         {Phoenix.PubSub, name: Vps.PubSub},
         Vps.Repo,
-        {SiteEncrypt.Phoenix, VpsWeb.Endpoint},
+        VpsWeb.Endpoint,
         VpsWeb.MyProxy,
         children(target()),
         Vps.StartupLogger
