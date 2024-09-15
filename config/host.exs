@@ -29,8 +29,8 @@ config :vps, VpsWeb.Endpoint,
   https: [port: 4105],
   url: [host: "localhost", port: 4104],
   secret_key_base: "//YcYyKOATqeqDuhCCjGuk0jpsZLR/KwcFlePCc9Cqab5WBIbkVXYk8HlTeHVLJt",
-  render_errors: [view: ProxyWeb.ErrorView, accepts: ~w(json), layout: false],
-  pubsub_server: Proxy.PubSub,
+  render_errors: [view: VpsWeb.ErrorView, accepts: ~w(json), layout: false],
+  pubsub_server: Vps.PubSub,
   live_view: [signing_salt: "B4RFj8oi"],
   watchers: []
 
