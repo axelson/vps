@@ -44,7 +44,7 @@ defmodule Vps.MixProject do
       # {:phoenix, "~> 1.7.1", override: true},
       {:phoenix, "~> 1.7.1"},
       {:ecto_sqlite3, "~> 0.9"},
-      {:telemetry_metrics, "~> 0.4"},
+      {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
       {:jason, "~> 1.0"},
       {:bandit, ">= 0.6.8"},
