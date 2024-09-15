@@ -88,3 +88,5 @@ config :logger, :console,
   metadata: [:request_id],
   stacktrace_depth: 20,
   plug_init_mode: :runtime
+
+config :logger, backends: [:console, RingLogger]

@@ -16,6 +16,8 @@ defmodule VpsWeb.MyProxy do
       # Needed for site_encrypt
       %{path: ~r/^\/.well-known\/acme-challenge\//, phoenix_endpoint: VpsWeb.Endpoint},
       site_configurations,
+      %{path: ~r/^\/logs/, phoenix_endpoint: VpsWeb.Endpoint},
+      %{path: ~r/^\/live/, phoenix_endpoint: VpsWeb.Endpoint},
       %{
         plug: VpsWeb.DefaultPlug
       }

@@ -7,13 +7,18 @@ defmodule VpsWeb.Endpoint do
   @session_options [
     store: :cookie,
     key: "_vps_key",
-    signing_salt: "qag42CRh"
+    signing_salt: "qag42CRh",
+    same_site: "Lax"
   ]
 
   socket("/socket", VpsWeb.UserSocket,
     websocket: true,
     longpoll: false
   )
+
+  socket "/live", Phoenix.LiveView.Socket,
+    websocket: [connect_info: [session: @session_options]],
+    longpoll: [connect_info: [session: @session_options]]
 
   # Serve at "/" the static files from "priv/static" directory.
   #

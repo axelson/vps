@@ -65,6 +65,9 @@ defmodule Vps.MixProject do
       {:sketchpad, github: "axelson/sketchpad"},
       {:jamroom, github: "axelson/jamroom"},
 
+      # helpers
+      {:log_viz, github: "axelson/log_viz"},
+
       # Dependencies for all targets except :host
       {:nerves_runtime, "~> 0.13.0", targets: @all_targets},
       {:nerves_pack, "~> 0.7.0", targets: @all_targets},
