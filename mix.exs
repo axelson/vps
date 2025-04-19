@@ -74,7 +74,11 @@ defmodule Vps.MixProject do
 
       # Dependencies for specific targets
       {:nerves_system_x86_64, "~> 1.13", runtime: false, targets: :x86_64},
-      {:nerves_system_vultr, "> 0.12.0", runtime: false, targets: :vultr}
+      {:nerves_system_vultr, "> 0.12.0", runtime: false, targets: :vultr},
+
+      # General
+      # Fixes CVE
+      {:nerves_system_br, "1.30.1", runtime: false}
     ]
   end
 
