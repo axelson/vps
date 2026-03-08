@@ -108,8 +108,8 @@ keys =
     Path.join([System.user_home!(), ".ssh", "id_ecdsa.pub"]),
     Path.join([System.user_home!(), ".ssh", "id_ed25519.pub"]),
     Path.join([System.user_home!(), ".ssh", "id_air_laptop.pub"]),
-    Path.join([System.user_home!(), ".ssh", "id_framework_laptop.pub"]),
-    Path.join([System.user_home!(), ".ssh", "id_desktop_rsa.pub"])
+    Path.join([System.user_home!(), ".ssh", "id_desktop_rsa.pub"]),
+    Path.join([System.user_home!(), ".ssh", "id_macbook_air_2014_ed25519.pub"])
   ]
   |> Enum.filter(&File.exists?/1)
 
