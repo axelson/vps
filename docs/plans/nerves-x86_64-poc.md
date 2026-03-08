@@ -356,7 +356,10 @@ gh release create x86-poc-v1 _build/x86_64_prod/nerves/images/vps.fw \
   --notes "Initial x86_64 PoC firmware for Vultr bootstrap"
 ```
 
-Note the download URL (e.g. `https://github.com/axelson/vps/releases/download/x86-poc-v1/vps.fw`). If the repo is private, use a temporary public URL instead (a signed S3/R2 URL, or serve locally via `ngrok`).
+The repo is public, so the release asset URL is directly downloadable without authentication:
+`https://github.com/axelson/vps/releases/download/x86-poc-v1/vps.fw`
+
+**What's in the firmware file?** The `.fw` is a ZIP archive containing the squashfs root filesystem (compiled Erlang release + baked-in config). It does NOT contain application secrets — those are loaded at runtime from `/data/.target.secret.exs` by `Vps.RuntimeConfigProvider`. What IS baked in: SSH authorized public keys (not sensitive), the Erlang cookie `"vps_cookie"` (already visible in `mix.exs`), domain names, and compiled BEAM files. No API keys, passwords, or TLS certificates are embedded. Since the source is already public, a public release asset adds no new exposure.
 
 ### Step 7: Bootstrap the New Vultr VM via Alpine Linux
 
