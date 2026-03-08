@@ -62,15 +62,98 @@ fwup -a -i /root/install.fw -d /dev/vda -t complete
 
 After reboot, the VM boots into Nerves from `/dev/vda`.
 
-### Key insight: the loader is system-agnostic
+### How the `.fw` file URL is specified
 
-The S3-hosted kernel and initrd are generic — they just run `fwup` against whatever `.fw` file you give them. The existing loader infrastructure (kernel + rootfs on S3 at `files.troodon-software.com`) can be **reused as-is** for the x86_64 firmware, since `nerves_system_x86_64` uses the same `fwup`-based format.
+iPXE's `initrd` command accepts an optional destination path as a second argument:
 
-The only thing that changes between systems is the `.fw` file URL in the iPXE script.
+```ipxe
+initrd https://example.com/vps.fw /root/install.fw
+```
+
+This downloads the file over HTTPS and injects it at `/root/install.fw` inside the merged initramfs (on top of the base `rootfs.cpio.xz`). **Any publicly reachable HTTPS URL works** — it is not specific to S3. GitHub release assets, Cloudflare R2, any CDN, or even a temporary URL all work equally well.
 
 ### Disk device note
 
 Vultr KVM VMs expose virtio block devices as `/dev/vda`. The `nerves_system_x86_64` `erlinit` config uses `/dev/rootdisk0p*` symlinks (created by erlinit at boot time, pointing at whatever device holds the root filesystem), so this is transparent — no config changes needed for `/dev/vda` vs `/dev/sda`.
+
+---
+
+## Can the Existing S3 Loader Be Reused?
+
+**Probably not safely.** There are two significant issues:
+
+### Issue 1: fwup version incompatibility (high risk)
+
+The `nerves_vultr_loader` is a **"v0.0.1 proof of concept"** built on Linux 4.11, which dates it to approximately 2017. The `fwup` binary in the S3-hosted `rootfs.cpio.xz` is from that era — likely version 0.15.x or similar.
+
+`nerves_system_x86_64 ~> 1.33` produces `.fw` files using **fwup 1.15.0** format. While fwup has tried to maintain backward compatibility for reading old files, an old `fwup` binary trying to write a new `.fw` file is the risky direction — new format features may be unrecognized by the old binary, causing the install to fail silently or write a corrupt image.
+
+This can be verified by attempting a write with the old binary, but it's a real risk for a production bootstrap.
+
+### Issue 2: Third-party infrastructure with no SLA (medium risk)
+
+The kernel and rootfs at `files.troodon-software.com` are hosted in Frank Hunleth's personal S3 bucket. There is no guarantee of availability, and the bucket could be deleted or made private at any time. Depending on it for production bootstrapping is fragile.
+
+### Conclusion
+
+The `.fw` file URL is trivially replaceable (just update the third `initrd` line). The kernel and rootfs are the problem. **Recommended approach: use a fresh bootstrapping method that doesn't depend on the old loader artifacts.**
+
+---
+
+## Recommended Bootstrap Approach: Alpine Linux + fwup
+
+The cleanest alternative that requires no pre-built infrastructure: boot the new VM with **Alpine Linux** (available directly in the Vultr VM creation UI), SSH in, download a static `fwup` binary from GitHub, write the firmware, and reboot.
+
+### Why this works
+
+- Alpine Linux is available as a standard Vultr OS option — no custom scripts or uploads needed
+- `fwup` publishes static pre-built binaries for Linux x86_64 on GitHub releases
+- The static binary runs on any Linux, no dependencies
+- The process takes ~5 minutes and uses only official sources
+
+### Bootstrap procedure
+
+```sh
+# 1. Create Vultr VM with Alpine Linux (standard option in Vultr UI)
+#    SSH in as root
+
+# 2. Download the fwup static binary (match version used by nerves_system_x86_64 ~> 1.33)
+wget https://github.com/fwup-home/fwup/releases/download/v1.15.0/fwup_1.15.0_x86_64.tar.gz
+tar xzf fwup_1.15.0_x86_64.tar.gz
+
+# 3. Download the Nerves firmware (from GitHub release or other host)
+wget https://<your-fw-url>/vps.fw
+
+# 4. Write the firmware to the VM's disk
+#    /dev/vda is Vultr's virtio disk
+./fwup -a -i vps.fw -d /dev/vda -t complete
+
+# 5. Reboot — the VM will now boot into Nerves
+reboot
+```
+
+After reboot, the Alpine Linux OS is completely replaced by Nerves. SSH will come up on port 22 with the keys configured in `config/target.exs`.
+
+### Hosting the `.fw` file
+
+The firmware file needs to be reachable via HTTPS during the bootstrap. The simplest option:
+
+**GitHub Releases** — attach `vps.fw` to a tagged release in this repo:
+
+```sh
+gh release create x86-poc-v1 _build/x86_64_prod/nerves/images/vps.fw \
+  --title "x86_64 PoC v1" \
+  --notes "Initial x86_64 PoC firmware"
+```
+
+The download URL will be:
+`https://github.com/axelson/vps/releases/download/x86-poc-v1/vps.fw`
+
+Note: if the repo is private, the URL will require authentication — use a temporary public URL (e.g. Cloudflare R2, a public S3 bucket, or a short-lived signed URL) for bootstrapping.
+
+### Alternative: iPXE with fresh loader artifacts
+
+If the iPXE approach is preferred (e.g., for repeatability across many VMs), build a fresh loader from source and host the artifacts yourself. The Buildroot project is at `/Users/jason/dev/forks/fhunleth-buildroot-experiments`. This produces a current `bzImage` and `rootfs.cpio.xz` with fwup 1.15.0, which you host on your own S3/R2 bucket. The iPXE script then points at your artifacts. This is more work upfront but makes subsequent VM provisioning fully automated.
 
 ---
 
@@ -265,50 +348,43 @@ Verify SSH access works and the application starts. HTTP will be on `localhost:8
 
 ### Step 6: Host the Firmware File
 
-The iPXE bootstrap needs the `.fw` file accessible via HTTPS. Options:
+Upload the firmware to GitHub Releases so it's reachable via HTTPS during bootstrap:
 
-- **GitHub Release**: Tag a release in this repo and attach `vps.fw` as a release asset
-- **S3 / Cloudflare R2**: Upload to an object storage bucket with a public URL
-- **Temporary HTTP server**: For one-off bootstrapping, `ngrok http` + `python3 -m http.server` works
-
-Example GitHub release approach:
 ```sh
-gh release create poc-v1 _build/x86_64_prod/nerves/images/vps.fw --title "PoC v1"
-# Note the download URL from the release page
+gh release create x86-poc-v1 _build/x86_64_prod/nerves/images/vps.fw \
+  --title "x86_64 PoC v1" \
+  --notes "Initial x86_64 PoC firmware for Vultr bootstrap"
 ```
 
-### Step 7: Create Vultr iPXE Startup Script
+Note the download URL (e.g. `https://github.com/axelson/vps/releases/download/x86-poc-v1/vps.fw`). If the repo is private, use a temporary public URL instead (a signed S3/R2 URL, or serve locally via `ngrok`).
 
-In the [Vultr control panel → Startup Scripts](https://my.vultr.com/startup/), create a new script of type **PXE** with this content:
+### Step 7: Bootstrap the New Vultr VM via Alpine Linux
 
-```ipxe
-#!ipxe
+The original `nerves_vultr_loader` iPXE approach uses ~2017 tooling (Linux 4.11, old `fwup`) stored in a third-party S3 bucket. The old `fwup` binary likely cannot write `.fw` files produced by the modern `nerves_system_x86_64 ~> 1.33`. Use **Alpine Linux** as the bootstrap environment instead — it's available directly in the Vultr OS selector and requires no custom infrastructure.
 
-# Download the loader's Linux kernel (reuse existing vultr loader infrastructure)
-kernel https://s3.amazonaws.com/files.troodon-software.com/vultr/bzImage
+1. Create a new Vultr Cloud Compute instance:
+   - Region: match the existing VM
+   - Plan: match or exceed the existing VM's specs
+   - **OS**: Alpine Linux
 
-# Download the loader's root filesystem (contains fwup + install script)
-initrd https://s3.amazonaws.com/files.troodon-software.com/vultr/rootfs.cpio.xz
+2. SSH in as `root`, then write the Nerves firmware:
 
-# Download the vps x86_64 firmware — UPDATE THIS URL
-initrd https://<your-fw-file-url>/vps.fw /root/install.fw
+```sh
+# Download fwup static binary (matches version used by nerves_system_x86_64 ~> 1.33)
+wget https://github.com/fwup-home/fwup/releases/download/v1.15.0/fwup_1.15.0_x86_64.tar.gz
+tar xzf fwup_1.15.0_x86_64.tar.gz
 
-boot
+# Download the Nerves firmware
+wget https://github.com/axelson/vps/releases/download/x86-poc-v1/vps.fw
+
+# Write firmware to the disk (/dev/vda is Vultr's virtio block device)
+./fwup -a -i vps.fw -d /dev/vda -t complete
+
+# Reboot — Alpine is completely replaced by Nerves
+reboot
 ```
 
-The key change from the original script is only the third `initrd` line — everything else (kernel, rootfs) is reused from the existing Vultr loader.
-
-**Note on the S3 URLs:** These are fhunleth's publicly hosted loader images from `files.troodon-software.com`. If they are unavailable, the loader will need to be rebuilt from the `nerves_vultr_loader` Buildroot project and hosted elsewhere.
-
-### Step 8: Create the New Vultr VM
-
-1. In Vultr, create a new Cloud Compute instance
-   - Type: Cloud Compute (shared or dedicated)
-   - Region: Match the existing VM's region
-   - Plan: Match or exceed the existing VM's specs
-   - **Server Image**: Choose "Upload ISO" → select "iPXE Custom Script" → choose the script created in Step 7
-2. The VM will boot, run the loader, write the Nerves firmware to `/dev/vda`, and reboot into Nerves
-3. Wait for the reboot — SSH will become available on port 22
+3. After reboot, SSH is on port 22 using the keys configured in `config/target.exs`.
 
 ### Step 9: Configure Runtime Secrets
 
@@ -363,10 +439,6 @@ After cutover, update `config/x86_64.exs` to use the production domains (or crea
 
 Pinning to `1.30.1` was specifically for CVE-2025-32433 (Erlang/OTP SSH vulnerability). That CVE affects the Erlang runtime included in the system, not the Buildroot scripts themselves — so the fix is actually in the Erlang version bundled by `nerves_system_br`. Version `1.33.2` bundles a much newer Erlang/OTP (28.x) which is well past that CVE's affected range.
 
-### Availability of Loader S3 Assets
-
-The kernel and rootfs images at `files.troodon-software.com` are hosted by Frank Hunleth and are not under our control. If unavailable, the fallback is to build the `nerves_vultr_loader` Buildroot project from source and host the artifacts. The source is at `/Users/jason/dev/forks/fhunleth-buildroot-experiments`.
-
 ### QEMU vs Vultr Networking
 
 In QEMU, the network is NATed — the VM gets a private IP and the host does port forwarding. This means:
@@ -376,7 +448,7 @@ In QEMU, the network is NATed — the VM gets a private IP and the host does por
 
 ### First Boot App Partition Formatting
 
-On first boot, Nerves formats the application data partition. The `S99load` script in the loader also pre-formats it (`mke2fs -t ext4 -L appdata /dev/vda4`), so this should be a no-op or transparent on the VM.
+On first boot, Nerves formats the application data partition (`/dev/rootdisk0p4`). This is expected behavior — it takes a few extra seconds and only happens once.
 
 ---
 
@@ -388,7 +460,7 @@ On first boot, Nerves formats the application data partition. The `S99load` scri
 | `config/target.exs` | Remove hard-coded domain config; uncomment `import_config "#{Mix.target()}.exs"` at the bottom |
 | `config/vultr.exs` | New file — production domain config (moved from `target.exs`) |
 | `config/x86_64.exs` | New file — PoC domain config (`-poc` subdomains) |
-| Vultr control panel | New Startup Script with updated `.fw` URL |
+| GitHub Releases | Upload `vps.fw` as a release asset for bootstrap download |
 | DNS | A records for PoC domains → new VM IP |
 
 ---
@@ -418,5 +490,6 @@ mix firmware.gen.script
 SSH_OPTIONS="-p 10022" ./upload.sh localhost   # QEMU
 ./upload.sh <vm-ip>                             # real VM
 
-# Deploy to Vultr: upload .fw, create iPXE script, spin up VM
+# Deploy to Vultr: tag a GitHub release with the .fw file, then
+# create an Alpine VM, SSH in, run fwup to write firmware, reboot
 ```
