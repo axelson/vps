@@ -171,15 +171,16 @@ mix deps.get && mix firmware
 qemu-img create -f raw /tmp/nerves-poc.img 4G
 
 # Write the firmware to the disk
-fwup -d /tmp/nerves-poc.img _build/x86_64_prod/nerves/images/vps.fw
+fwup -a -i _build/x86_64_prod/nerves/images/vps.fw -d /tmp/nerves-poc.img -t complete
 
 # Boot in QEMU
 # - Port 10022 → SSH (port 22 on the VM)
 # - Port 8080 → HTTP (port 80 on the VM)
+# Note: -netdev/device is the modern form; -net is deprecated but still works
 qemu-system-x86_64 \
   -drive file=/tmp/nerves-poc.img,if=virtio,format=raw \
-  -net nic,model=virtio \
-  -net user,hostfwd=tcp::10022-:22,hostfwd=tcp::8080-:80 \
+  -netdev user,id=net0,hostfwd=tcp::10022-:22,hostfwd=tcp::8080-:80 \
+  -device virtio-net-pci,netdev=net0 \
   -nographic \
   -serial mon:stdio \
   -m 2048
@@ -226,6 +227,8 @@ SSH_OPTIONS="-p 10022" ./upload.sh localhost
 {:nerves_system_br, "1.33.2", runtime: false}
 ```
 
+**Note on transitive conflicts:** Both `:vultr` and `:x86_64` system deps are in `mix.exs` simultaneously during the PoC phase. `nerves_system_vultr` will pull its own transitive `nerves_system_br` requirement. The top-level pin to `1.33.2` forces that version for all targets, which may or may not satisfy `nerves_system_vultr`'s requirement. If Hex reports a conflict, the cleanest fix is to remove the direct `nerves_system_br` pin and let the system packages negotiate — by `1.33.x` the CVE is long fixed in any Erlang version they bundle.
+
 ### Step 2: Update `nerves_system_x86_64` Dependency
 
 Update to the current version from hex.pm:
@@ -239,6 +242,15 @@ Update to the current version from hex.pm:
 ```
 
 Nerves will automatically download the prebuilt system artifact from GitHub releases — no local Buildroot compilation required.
+
+**Dependency compatibility check:** After updating, run `mix deps.get` and inspect any version conflicts. `nerves_runtime ~> 0.13.0` and `nerves_pack ~> 0.7.0` in `mix.exs` are old and may need bumping — `nerves_system_x86_64 ~> 1.33` was developed against newer versions of both. If `mix deps.get` reports conflicts or `mix firmware` fails with undefined function errors, bump these:
+
+```elixir
+{:nerves_runtime, "~> 0.13", targets: @all_targets},   # relax patch pin if needed
+{:nerves_pack, "~> 0.7", targets: @all_targets},        # bump minor if needed
+```
+
+Check each package's changelog for breaking changes before bumping.
 
 ### Step 3: Update Elixir Version Requirement
 
@@ -336,15 +348,17 @@ mix firmware
 
 # Write to virtual disk and boot in QEMU
 qemu-img create -f raw /tmp/nerves-poc.img 4G
-fwup -d /tmp/nerves-poc.img _build/x86_64_prod/nerves/images/vps.fw
+fwup -a -i _build/x86_64_prod/nerves/images/vps.fw -d /tmp/nerves-poc.img -t complete
 qemu-system-x86_64 \
   -drive file=/tmp/nerves-poc.img,if=virtio,format=raw \
-  -net nic,model=virtio \
-  -net user,hostfwd=tcp::10022-:22,hostfwd=tcp::8080-:80 \
+  -netdev user,id=net0,hostfwd=tcp::10022-:22,hostfwd=tcp::8080-:80 \
+  -device virtio-net-pci,netdev=net0 \
   -nographic -serial mon:stdio -m 2048
 ```
 
 Verify SSH access works and the application starts. HTTP will be on `localhost:8080` (no TLS in QEMU since there's no real domain/cert — use `cert_mode: "local"` in x86_64.exs for QEMU testing if needed).
+
+**`vintage_net` interface check:** Once SSH'd in, run `VintageNet.info()` to confirm the network interface name. The `target.exs` config hardcodes `"eth0"` — on QEMU with virtio this is typically correct, but confirm before assuming Vultr networking will work. If the interface is named differently (e.g. `"enp1s0"`), add an override in `config/x86_64.exs`.
 
 ### Step 6: Host the Firmware File
 
@@ -389,7 +403,7 @@ reboot
 
 3. After reboot, SSH is on port 22 using the keys configured in `config/target.exs`.
 
-### Step 9: Configure Runtime Secrets
+### Step 8: Configure Runtime Secrets
 
 ```sh
 # Copy secrets to the new VM after it boots
@@ -402,7 +416,7 @@ The `Vps.RuntimeConfigProvider` loads this file at boot. You may need to reboot 
 ssh nerves@<new-vm-ip> 'reboot'
 ```
 
-### Step 10: Configure DNS
+### Step 9: Configure DNS
 
 Add A records for the PoC domains:
 
@@ -416,7 +430,7 @@ jamroom-poc.jasonaxelson.com      A  <new-vm-ip>
 
 SiteEncrypt will obtain Let's Encrypt certificates automatically on first HTTPS request.
 
-### Step 11: Verify the PoC
+### Step 10: Verify the PoC
 
 1. `https://poc.jasonaxelson.com/logs` — LogViz UI loads
 2. Each sub-app at its `-poc` domain loads correctly
@@ -425,7 +439,7 @@ SiteEncrypt will obtain Let's Encrypt certificates automatically on first HTTPS 
 5. OTA update works: `MIX_TARGET=x86_64 MIX_ENV=prod ./upload.sh <new-vm-ip>`
 6. Existing production service is unaffected
 
-### Step 12: Cutover (After PoC Verified)
+### Step 11: Cutover (After PoC Verified)
 
 1. Update DNS: point the production domains to the new VM's IP
 2. Wait for TTL to expire
@@ -459,7 +473,7 @@ On first boot, Nerves formats the application data partition (`/dev/rootdisk0p4`
 
 | File | Change |
 |------|--------|
-| `mix.exs` | Bump `nerves_system_x86_64` to `~> 1.33`, update `nerves_system_br` to `1.33.2`, update `elixir` to `~> 1.17` |
+| `mix.exs` | Bump `nerves_system_x86_64` to `~> 1.33`, update `nerves_system_br` to `1.33.2`, update `elixir` to `~> 1.17`; possibly bump `nerves_runtime` and `nerves_pack` if Hex reports conflicts |
 | `config/target.exs` | Remove hard-coded domain config; uncomment `import_config "#{Mix.target()}.exs"` at the bottom |
 | `config/vultr.exs` | New file — production domain config (moved from `target.exs`) |
 | `config/x86_64.exs` | New file — PoC domain config (`-poc` subdomains) |
@@ -478,11 +492,11 @@ mix deps.get && mix firmware
 
 # Test in QEMU
 qemu-img create -f raw /tmp/nerves-poc.img 4G
-fwup -d /tmp/nerves-poc.img _build/x86_64_prod/nerves/images/vps.fw
+fwup -a -i _build/x86_64_prod/nerves/images/vps.fw -d /tmp/nerves-poc.img -t complete
 qemu-system-x86_64 \
   -drive file=/tmp/nerves-poc.img,if=virtio,format=raw \
-  -net nic,model=virtio \
-  -net user,hostfwd=tcp::10022-:22,hostfwd=tcp::8080-:80 \
+  -netdev user,id=net0,hostfwd=tcp::10022-:22,hostfwd=tcp::8080-:80 \
+  -device virtio-net-pci,netdev=net0 \
   -nographic -serial mon:stdio -m 2048
 
 # SSH into QEMU
