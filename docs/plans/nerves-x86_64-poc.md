@@ -360,6 +360,10 @@ Verify SSH access works and the application starts. HTTP will be on `localhost:8
 
 **`vintage_net` interface check:** Once SSH'd in, run `VintageNet.info()` to confirm the network interface name. The `target.exs` config hardcodes `"eth0"` — on QEMU with virtio this is typically correct, but confirm before assuming Vultr networking will work. If the interface is named differently (e.g. `"enp1s0"`), add an override in `config/x86_64.exs`.
 
+Specific commands:
+- curl -v http://localhost:8080/
+- ssh -p 10022 nerves@localhost
+
 ### Step 6: Host the Firmware File
 
 Upload the firmware to GitHub Releases so it's reachable via HTTPS during bootstrap:
@@ -400,6 +404,11 @@ wget https://github.com/axelson/vps/releases/download/x86-poc-v1/vps.fw
 # Reboot — Alpine is completely replaced by Nerves
 reboot
 ```
+
+wget https://github.com/fwup-home/fwup/releases/download/v1.15.0/fwup_1.15.0_amd64.deb
+dpkg -i fwup_1.15.0_amd64.deb
+fwup -a -i vps.fw -d /dev/vda -t complete
+
 
 3. After reboot, SSH is on port 22 using the keys configured in `config/target.exs`.
 
@@ -510,3 +519,31 @@ SSH_OPTIONS="-p 10022" ./upload.sh localhost   # QEMU
 # Deploy to Vultr: tag a GitHub release with the .fw file, then
 # create an Alpine VM, SSH in, run fwup to write firmware, reboot
 ```
+
+
+
+⏺ All code changes are complete. Here's a summary of what was implemented (Steps 1–4 of the plan):
+
+  mix.exs
+  - elixir: "~> 1.9" → "~> 1.17" (Step 3)
+  - nerves_system_x86_64 "~> 1.13" → "~> 1.33" (Step 2)
+  - nerves_system_br "1.30.1" → "1.33.2" (Step 1)
+
+  config/target.exs (Step 4c)
+  - Removed hard-coded production domain config (now in per-target files)
+  - Uncommented import_config "#{Mix.target()}.exs"
+
+  config/vultr.exs (Step 4a) — new file with production domains (pham.jasonaxelson.com, etc.)
+
+  config/x86_64.exs (Step 4b) — new file with PoC domains (poc.jasonaxelson.com, -poc subdomains)
+
+  Next steps (manual):
+  1. Run MIX_TARGET=x86_64 MIX_ENV=prod mix deps.get — watch for version conflicts with nerves_runtime/nerves_pack
+  2. Run mix firmware to build
+  3. Test locally with QEMU (Step 5 from plan)
+  4. Upload .fw to GitHub Releases and bootstrap the Vultr VM (Steps 6–7)
+
+ssh poc.jasonaxelson.com
+
+Things to fix:
+- RingLogger.attach doesn't print out logs in IEx, instead they get printed out to the raw console

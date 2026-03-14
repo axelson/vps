@@ -35,3 +35,5 @@ fw-*.tar
 /vps/tmp
 
 /priv/database.db*
+
+.claude/settings.local.json
