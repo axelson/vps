@@ -93,14 +93,15 @@ Generate secrets and configure domains (replace `poc3.jasonaxelson.com` with the
 secret = fn -> :crypto.strong_rand_bytes(64) |> Base.encode64() end
 salt = fn -> :crypto.strong_rand_bytes(32) |> Base.encode64() end
 
-host = "poc3.jasonaxelson.com"
+# IMPORTANT: Update these domains for your actual deploy
+host = "poc.localhost"
 port = 443
 
 endpoint_configs = [
-  {:gviz, GVizWeb.Endpoint, "depviz.poc3.jasonaxelson.com"},
-  {:makeup_live, MakeupLiveWeb.Endpoint, "makeuplive.poc3.jasonaxelson.com"},
-  {:sketchpad, SketchpadWeb.Endpoint, "sketch.poc3.jasonaxelson.com"},
-  {:jamroom, JamroomWeb.Endpoint, "jamroom.poc3.jasonaxelson.com"}
+  {:gviz, GVizWeb.Endpoint, "depviz.localhost"},
+  {:makeup_live, MakeupLiveWeb.Endpoint, "makeuplive.localhost"},
+  {:sketchpad, SketchpadWeb.Endpoint, "sketch.localhost"},
+  {:jamroom, JamroomWeb.Endpoint, "jamroom.localhost"}
 ]
 
 domains = Enum.map(endpoint_configs, fn {_, _, d} -> d end)

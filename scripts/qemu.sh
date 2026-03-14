@@ -16,7 +16,7 @@ DISK="/tmp/nerves-qemu.img"
 
 if [ ! -f "$FIRMWARE" ]; then
   echo "Firmware not found at $FIRMWARE — run:"
-  echo "  export VPS_INSTANCE=poc3 MIX_TARGET=x86_64 MIX_ENV=prod"
+  echo "  export VPS_INSTANCE=qemu MIX_TARGET=x86_64 MIX_ENV=prod"
   echo "  mix compile && mix firmware"
   exit 1
 fi
@@ -36,6 +36,4 @@ qemu-system-x86_64 \
   -drive file="$DISK",if=virtio,format=raw \
   -netdev user,id=net0,hostfwd=tcp::10022-:22,hostfwd=tcp::8080-:80 \
   -device virtio-net-pci,netdev=net0 \
-  -nographic \
-  -serial mon:stdio \
   -m 2048
