@@ -159,6 +159,8 @@ SiteEncrypt.force_certify(VpsWeb.Endpoint)
 
 Watch the IEx console for `Certificate successfully obtained!` (via `RingLogger.attach`).
 
+Note: you may need to wait 5-30 minutes before this works due to DNS propagation issues
+
 ---
 
 ## Step 8: Verify
