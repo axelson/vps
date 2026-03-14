@@ -68,33 +68,62 @@ In the Vultr dashboard navigate to your server and remove the ISO (Settings -> C
 
 ## Step 4: Add DNS Records
 
-In your DNS system where your domain is registered do the following.
-
-Add A records pointing all domains to the new VM's IP:
+Add a wildcard A record pointing to the new VM's IP — this covers all subdomains for the instance:
 
 | Hostname | Type | Value |
 |---|---|---|
-| `poc.jasonaxelson.com` | A | `<vm-ip>` |
-| `depviz-poc.jasonaxelson.com` | A | `<vm-ip>` |
-| `makeuplive-poc.jasonaxelson.com` | A | `<vm-ip>` |
-| `sketch-poc.jasonaxelson.com` | A | `<vm-ip>` |
-| `jamroom-poc.jasonaxelson.com` | A | `<vm-ip>` |
+| `*.poc3.jasonaxelson.com` | A | `<vm-ip>` |
+| `poc3.jasonaxelson.com` | A | `<vm-ip>` |
+
+Adjust the subdomain to match the instance name (e.g. `*.poc3.jasonaxelson.com` for poc3).
+
+Note: if you don't want to use a wildcard then you need to use a DNS record for each subdomain
 
 ---
 
-## Step 5: Configure Runtime Secrets
+## Step 5: Configure Runtime Secrets and Domains
 
 After Nerves boots, connect via the noVNC console (IEx prompt appears there due to `ctty: "tty1"`) or via SSH.
 
-Generate and write fresh secrets:
+Domain names are configured per-instance here — the same firmware binary works for any instance. The `Vps.RuntimeConfigProvider` runs after `config/runtime.exs`, so values set here override the compile-time defaults in `config/x86_64.exs`. Sub-app endpoint URLs must also be set explicitly here for the same reason.
+
+Generate secrets and configure domains (replace `poc3.jasonaxelson.com` with the instance's domain):
 
 ```elixir
 secret = fn -> :crypto.strong_rand_bytes(64) |> Base.encode64() end
 salt = fn -> :crypto.strong_rand_bytes(32) |> Base.encode64() end
 
+host = "poc3.jasonaxelson.com"
+port = 443
+
+endpoint_configs = [
+  {:gviz, GVizWeb.Endpoint, "depviz.poc3.jasonaxelson.com"},
+  {:makeup_live, MakeupLiveWeb.Endpoint, "makeuplive.poc3.jasonaxelson.com"},
+  {:sketchpad, SketchpadWeb.Endpoint, "sketch.poc3.jasonaxelson.com"},
+  {:jamroom, JamroomWeb.Endpoint, "jamroom.poc3.jasonaxelson.com"}
+]
+
+domains = Enum.map(endpoint_configs, fn {_, _, d} -> d end)
+
 File.write!("/data/.target.secret.exs", """
 import Config
-config :vps, VpsWeb.Endpoint, secret_key_base: "#{secret.()}", live_view: [signing_salt: "#{salt.()}"]
+
+endpoint_configs = #{inspect(endpoint_configs)}
+domains = Enum.map(endpoint_configs, fn {_, _, d} -> d end)
+
+config :vps,
+  endpoint_configs: endpoint_configs,
+  site_encrypt_domains: ["#{host}"] ++ domains
+
+config :vps, VpsWeb.Endpoint,
+  url: [host: "#{host}", port: 80],
+  secret_key_base: "#{secret.()}",
+  live_view: [signing_salt: "#{salt.()}"]
+
+for {app, endpoint, hostname} <- endpoint_configs do
+  config app, endpoint, url: [host: hostname, port: #{port}], hostname: hostname
+end
+
 config :gviz, GVizWeb.Endpoint, secret_key_base: "#{secret.()}", live_view: [signing_salt: "#{salt.()}"]
 config :makeup_live, MakeupLiveWeb.Endpoint, secret_key_base: "#{secret.()}", live_view: [signing_salt: "#{salt.()}"]
 config :sketchpad, SketchpadWeb.Endpoint, secret_key_base: "#{secret.()}", live_view: [signing_salt: "#{salt.()}"]
@@ -106,6 +135,12 @@ Then restart the BEAM to pick up the new config (no full reboot needed):
 
 ```elixir
 :init.restart()
+```
+
+Then run database migrations (the SQLite file is created automatically by the Repo on startup, but the schema needs to be applied):
+
+```elixir
+Vps.Release.migrate()
 ```
 
 ---
@@ -128,11 +163,11 @@ Watch the IEx console for `Certificate successfully obtained!` (via `RingLogger.
 
 ## Step 8: Verify
 
-- `https://poc.jasonaxelson.com/` — loads with valid TLS cert
-- `https://depviz-poc.jasonaxelson.com/` — dep_viz loads
-- `https://makeuplive-poc.jasonaxelson.com/` — makeup_live loads
-- `https://sketch-poc.jasonaxelson.com/` — sketchpad loads
-- `https://jamroom-poc.jasonaxelson.com/` — jamroom loads
+- `https://poc3.jasonaxelson.com/` — loads with valid TLS cert
+- `https://depviz.poc3.jasonaxelson.com/` — dep_viz loads
+- `https://makeuplive.poc3.jasonaxelson.com/` — makeup_live loads
+- `https://sketch.poc3.jasonaxelson.com/` — sketchpad loads
+- `https://jamroom.poc3.jasonaxelson.com/` — jamroom loads
 - SSH: `ssh nerves@<vm-ip>`
 - OTA update: `MIX_TARGET=x86_64 MIX_ENV=prod ./upload.sh <vm-ip>`
 
