@@ -71,12 +71,12 @@ defmodule Vps.MixProject do
       # Dependencies for all targets except :host
       {:nerves_runtime, "~> 0.13", targets: @all_targets},
       {:nerves_pack, "~> 0.7.0", targets: @all_targets},
+      # {:nerves_ssh, path: "deps/nerves_ssh", targets: @all_targets, override: true},
 
       # Dependencies for specific targets
       {:nerves_system_x86_64, "~> 1.33", runtime: false, targets: :x86_64},
       # General
-      # Fixes CVE-2025-32433 (included in 1.33.x+)
-      {:nerves_system_br, "1.33.2", runtime: false}
+      {:nerves_system_br, "~> 1.33.4", runtime: false}
     ]
   end
 
