@@ -12,7 +12,7 @@
 set -e
 
 FIRMWARE="_build/x86_64_prod/nerves/images/vps.fw"
-DISK="/tmp/nerves-qemu.img"
+DISK="extra/nerves-qemu.img"
 
 if [ ! -f "$FIRMWARE" ]; then
   echo "Firmware not found at $FIRMWARE — run:"

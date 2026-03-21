@@ -37,3 +37,4 @@ fw-*.tar
 /priv/database.db*
 
 .claude/settings.local.json
+/extra/nerves-qemu.img
