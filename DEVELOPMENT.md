@@ -1,5 +1,9 @@
 # Development
 
+## Bootstrapping
+
+See `docs/bootstrapping.md` for initial bootstrapping instructions
+
 ## Deploy to production (vultr.com) with nerves_system_x86_64 (current)
 
 Build and upload — set `VPS_INSTANCE` to select the domain config:
