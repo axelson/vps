@@ -9,9 +9,9 @@ See `docs/bootstrapping.md` for initial bootstrapping instructions
 Build and upload — set `VPS_INSTANCE` to select the domain config:
 
 ```sh
-# poc3 (default)
+# poc3
 export VPS_INSTANCE=poc3 MIX_TARGET=x86_64 MIX_ENV=prod
-mix compile --warnings-as-errors && mix firmware && ./upload.sh 144.202.117.48
+mix compile --warnings-as-errors && mix firmware && ./upload.sh vultr
 
 # production
 export VPS_INSTANCE=production MIX_TARGET=x86_64 MIX_ENV=prod
@@ -34,13 +34,6 @@ mix compile --warnings-as-errors && mix firmware && ./scripts/qemu-upload.sh
 ```
 
 Visit http://localhost:8080
-
-## Deploy to vultr (legacy, retired)
-
-```sh
-set -x MIX_TARGET vultr; set -x MIX_ENV prod
-mix compile --warnings-as-errors && mix firmware && mix upload vultr
-```
 
 ## Troubleshooting
 
