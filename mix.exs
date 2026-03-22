@@ -3,13 +3,13 @@ defmodule Vps.MixProject do
 
   @app :vps
   @version "0.1.0"
-  @all_targets [:rpi, :rpi0, :rpi2, :rpi3, :rpi3a, :rpi4, :bbb, :osd32mp1, :x86_64, :vultr]
+  @all_targets [:rpi, :rpi0, :rpi2, :rpi3, :rpi3a, :rpi4, :bbb, :osd32mp1, :x86_64]
 
   def project do
     [
       app: @app,
       version: @version,
-      elixir: "~> 1.9",
+      elixir: "~> 1.17",
       elixirc_paths: elixirc_paths(Mix.env()),
       archives: [nerves_bootstrap: "~> 1.10"],
       start_permanent: Mix.env() == :prod,
@@ -37,7 +37,7 @@ defmodule Vps.MixProject do
   defp deps do
     [
       # Dependencies for all targets
-      {:nerves, "~> 1.11.0", runtime: false},
+      {:nerves, "~> 1.13.2", runtime: false},
       {:shoehorn, "~> 0.9.1"},
       {:ring_logger, "~> 0.10"},
       {:toolshed, "~> 0.3"},
@@ -49,7 +49,7 @@ defmodule Vps.MixProject do
       {:jason, "~> 1.0"},
       {:bandit, ">= 0.6.8"},
 
-      {:site_encrypt, "~> 0.6.0"},
+      {:site_encrypt, "~> 0.7.0"},
       # {:site_encrypt, path: "~/dev/forks/site_encrypt"},
       # {:site_encrypt, github: "axelson/site_encrypt", branch: "update-deps"},
 
@@ -69,16 +69,14 @@ defmodule Vps.MixProject do
       {:log_viz, github: "axelson/log_viz"},
 
       # Dependencies for all targets except :host
-      {:nerves_runtime, "~> 0.13.0", targets: @all_targets},
+      {:nerves_runtime, "~> 0.13", targets: @all_targets},
       {:nerves_pack, "~> 0.7.0", targets: @all_targets},
+      # {:nerves_ssh, path: "deps/nerves_ssh", targets: @all_targets, override: true},
 
       # Dependencies for specific targets
-      {:nerves_system_x86_64, "~> 1.13", runtime: false, targets: :x86_64},
-      {:nerves_system_vultr, "> 0.12.0", runtime: false, targets: :vultr},
-
+      {:nerves_system_x86_64, "~> 1.33", runtime: false, targets: :x86_64},
       # General
-      # Fixes CVE
-      {:nerves_system_br, "1.30.1", runtime: false}
+      {:nerves_system_br, "~> 1.33.4", runtime: false}
     ]
   end
 

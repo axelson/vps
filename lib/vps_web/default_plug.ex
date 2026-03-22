@@ -33,24 +33,13 @@ defmodule VpsWeb.DefaultPlug do
   end
 
   defp build_url(domain) do
-    http_mode = Application.fetch_env!(:vps, :http_mode)
-
     scheme =
-      case http_mode do
+      case Application.fetch_env!(:vps, :http_mode) do
         :https -> "https://"
         :http -> "http://"
       end
 
-    port =
-      case http_mode do
-        :http ->
-          scheme_opts = Application.get_env(:main_proxy, :http, [])
-          :proplists.get_value(:port, scheme_opts)
-
-        :https ->
-          scheme_opts = Application.get_env(:main_proxy, :https, [])
-          :proplists.get_value(:port, scheme_opts)
-      end
+    port = Application.fetch_env!(:vps, :port)
 
     scheme <> domain <> ":" <> to_string(port)
   end

@@ -57,6 +57,7 @@ iex -S mix phx.server
 Then add the following lines to your `/etc/hosts` file:
 
 ```
+127.0.0.1 pham.test
 127.0.0.1 depviz.localhost
 127.0.0.1 makeuplive.localhost
 127.0.0.1 sketch.localhost

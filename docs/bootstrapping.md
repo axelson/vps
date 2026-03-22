@@ -1,0 +1,175 @@
+# Bootstrapping a New Vultr VM
+
+How to provision a fresh Vultr VM running this Nerves firmware from scratch.
+
+---
+
+## Prerequisites
+
+- Firmware built and uploaded to GitHub Releases (see below)
+- DNS A records added for all target domains
+- `/data/.target.secret.exs` contents ready to deploy
+
+---
+
+## Step 1: Build and Upload Firmware
+
+```sh
+MIX_TARGET=x86_64 MIX_ENV=prod mix compile --warnings-as-errors && mix firmware
+```
+
+Upload to GitHub Releases (creates or overwrites the release asset):
+
+```sh
+gh release upload x86-poc-v1 _build/x86_64_prod/nerves/images/vps.fw --clobber
+```
+
+The firmware will be downloadable at:
+`https://github.com/axelson/vps/releases/download/x86-poc-v1/vps.fw`
+
+The repo is public so no authentication is needed.
+
+---
+
+## Step 2: Create Vultr VM and Boot Alpine ISO
+
+1. Create a new Vultr Cloud Compute instance (match region and plan of existing VM)
+2. In the **ISO** section, attach a custom ISO using this URL:
+   ```
+   https://dl-cdn.alpinelinux.org/alpine/latest-stable/releases/x86_64/alpine-standard-3.23.3-x86_64.iso
+   ```
+   (Check for a newer version at `https://dl-cdn.alpinelinux.org/alpine/latest-stable/releases/x86_64/`)
+   - Note: you may need to download it to your host machine and upload it to the Vultr dashboard as a Custom ISO
+3. Boot the VM — it will start into the Alpine live environment
+4. Open the noVNC console and log in as `root` (no password)
+
+---
+
+## Step 3: Flash Nerves Firmware
+
+Run this single compound command in the Alpine console:
+
+```sh
+ip link set eth0 up && udhcpc -i eth0 \
+  && echo "https://dl-cdn.alpinelinux.org/alpine/latest-stable/community" >> /etc/apk/repositories \
+  && echo "https://dl-cdn.alpinelinux.org/alpine/latest-stable/main" >> /etc/apk/repositories \
+  && apk update && apk add fwup e2fsprogs \
+  && wget -O /root/vps.fw https://github.com/axelson/vps/releases/download/x86-poc-v1/vps.fw \
+  && fwup -a -i /root/vps.fw -d /dev/vda -t complete
+```
+
+Tip: To paste into the noVNC console click the little arrow on the left of the screen and click on the clipboard icon
+
+This will: bring up networking, add the Alpine community repo (needed for fwup), install fwup and e2fsprogs, download the firmware, write it to `/dev/vda`, and reboot.
+
+In the Vultr dashboard navigate to your server and remove the ISO (Settings -> Custom ISO -> Remove ISO) which will cause the server to reboot into Nerves
+
+---
+
+## Step 4: Add DNS Records
+
+Add a wildcard A record pointing to the new VM's IP — this covers all subdomains for the instance:
+
+| Hostname | Type | Value |
+|---|---|---|
+| `*.poc3.jasonaxelson.com` | A | `<vm-ip>` |
+| `poc3.jasonaxelson.com` | A | `<vm-ip>` |
+
+Adjust the subdomain to match the instance name (e.g. `*.poc3.jasonaxelson.com` for poc3).
+
+Note: if you don't want to use a wildcard then you need to use a DNS record for each subdomain
+
+---
+
+## Step 5: Configure Runtime Secrets and Domains
+
+After Nerves boots, connect via the noVNC console (IEx prompt appears there due to `ctty: "tty1"`) or via SSH.
+
+Domain names are configured per-instance here — the same firmware binary works for any instance. The `Vps.RuntimeConfigProvider` runs after `config/runtime.exs`, so values set here override the compile-time defaults in `config/x86_64.exs`. Sub-app endpoint URLs must also be set explicitly here for the same reason.
+
+Generate secrets and configure domains (replace `poc3.jasonaxelson.com` with the instance's domain):
+
+```elixir
+secret = fn -> :crypto.strong_rand_bytes(64) |> Base.encode64() end
+salt = fn -> :crypto.strong_rand_bytes(32) |> Base.encode64() end
+
+# IMPORTANT: Update these domains for your actual deploy
+host = "localhost"
+port = 8080
+
+endpoint_configs = [
+  {:gviz, GVizWeb.Endpoint, "depviz.localhost"},
+  {:makeup_live, MakeupLiveWeb.Endpoint, "makeuplive.localhost"},
+  {:sketchpad, SketchpadWeb.Endpoint, "sketch.localhost"},
+  {:jamroom, JamroomWeb.Endpoint, "jamroom.localhost"}
+]
+
+domains = Enum.map(endpoint_configs, fn {_, _, d} -> d end)
+
+File.write!("/data/.target.secret.exs", """
+import Config
+
+endpoint_configs = #{inspect(endpoint_configs)}
+domains = Enum.map(endpoint_configs, fn {_, _, d} -> d end)
+
+config :vps,
+  endpoint_configs: endpoint_configs,
+  site_encrypt_domains: ["#{host}"] ++ domains
+
+config :vps, VpsWeb.Endpoint,
+  url: [host: "#{host}", port: 80],
+  secret_key_base: "#{secret.()}",
+  live_view: [signing_salt: "#{salt.()}"]
+
+for {app, endpoint, hostname} <- endpoint_configs do
+  config app, endpoint, url: [host: hostname, port: #{port}], hostname: hostname
+end
+
+config :gviz, GVizWeb.Endpoint, secret_key_base: "#{secret.()}", live_view: [signing_salt: "#{salt.()}"]
+config :makeup_live, MakeupLiveWeb.Endpoint, secret_key_base: "#{secret.()}", live_view: [signing_salt: "#{salt.()}"]
+config :sketchpad, SketchpadWeb.Endpoint, secret_key_base: "#{secret.()}", live_view: [signing_salt: "#{salt.()}"]
+config :jamroom, JamroomWeb.Endpoint, secret_key_base: "#{secret.()}", live_view: [signing_salt: "#{salt.()}"]
+""")
+```
+
+Then restart the BEAM to pick up the new config (no full reboot needed):
+
+```elixir
+:init.restart()
+```
+
+Then run database migrations (the SQLite file is created automatically by the Repo on startup, but the schema needs to be applied):
+
+```elixir
+Vps.Release.migrate()
+```
+
+---
+
+## Step 6: Deploy latest version
+
+The firmware version installed in Step 5 is outdated, install the latest by folowing `DEVELOPMENT.md`
+
+## Step 7: Issue Let's Encrypt Certificates
+
+site_encrypt generates a self-signed cert on first boot and schedules real cert issuance for 3:32 AM UTC. To get real certs immediately:
+
+```elixir
+SiteEncrypt.force_certify(VpsWeb.Endpoint)
+```
+
+Watch the IEx console for `Certificate successfully obtained!` (via `RingLogger.attach`).
+
+Note: you may need to wait 5-30 minutes before this works due to DNS propagation issues
+
+---
+
+## Step 8: Verify
+
+- `https://poc3.jasonaxelson.com/` — loads with valid TLS cert
+- `https://depviz.poc3.jasonaxelson.com/` — dep_viz loads
+- `https://makeuplive.poc3.jasonaxelson.com/` — makeup_live loads
+- `https://sketch.poc3.jasonaxelson.com/` — sketchpad loads
+- `https://jamroom.poc3.jasonaxelson.com/` — jamroom loads
+- SSH: `ssh nerves@<vm-ip>`
+- OTA update: `MIX_TARGET=x86_64 MIX_ENV=prod ./upload.sh <vm-ip>`

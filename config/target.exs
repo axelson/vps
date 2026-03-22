@@ -1,30 +1,5 @@
 import Config
 
-endpoint_configs = [
-  {:gviz, GVizWeb.Endpoint, "depviz.jasonaxelson.com"},
-  {:makeup_live, MakeupLiveWeb.Endpoint, "makeuplive.jasonaxelson.com"},
-  {:sketchpad, SketchpadWeb.Endpoint, "sketch.jasonaxelson.com"},
-  {:jamroom, JamroomWeb.Endpoint, "jamroom.jasonaxelson.com"}
-]
-
-domains = Enum.map(endpoint_configs, fn {_, _, domain} -> domain end)
-
-config :vps,
-  http_mode: :https,
-  port: 443,
-  endpoint_configs: endpoint_configs,
-  cert_mode: "production",
-  site_encrypt_db_folder: Path.join(~w[/data site_encrypt]),
-  site_encrypt_domains: ["pham.jasonaxelson.com"] ++ domains
-
-config :vps, Vps.Repo, database: "/data/vps.db"
-
-config :vps, VpsWeb.Endpoint,
-  url: [host: "pham.jasonaxelson.com", port: 80],
-  render_errors: [view: VpsWeb.ErrorView, accepts: ~w(json), layout: false],
-  pubsub_server: Vps.PubSub,
-  server: false
-
 config :gviz, GVizWeb.Endpoint,
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
   check_origin: false,
@@ -38,15 +13,14 @@ config :makeup_live, MakeupLiveWeb.Endpoint,
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
   # check_origin: false,
   root: Path.dirname(__DIR__),
-  render_errors: [view: MakeupLiveWeb.ErrorView, accepts: ~w(html json)],
+  render_errors: [formats: [html: MakeupLiveWeb.ErrorHTML, json: MakeupLiveWeb.ErrorJSON], layout: false],
   pubsub_server: MakeupLive.PubSub,
-  force_ssl: [rewrite_on: [:x_forwarded_proto]],
   cache_static_manifest: "priv/static/cache_manifest.json",
   server: false
 
 config :sketchpad, SketchpadWeb.Endpoint,
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
-  render_errors: [view: SketchpadWeb.ErrorView, accepts: ~w(html json)],
+  render_errors: [formats: [html: SketchpadWeb.ErrorHTML, json: SketchpadWeb.ErrorJSON], layout: false],
   # check_origin: false,
   root: Path.dirname(__DIR__),
   cache_static_manifest: "priv/static/cache_manifest.json",
@@ -94,7 +68,9 @@ config :nerves,
   erlinit: [
     hostname_pattern: "nerves-%s",
     # Workaround for https://github.com/nerves-project/nerves/issues/632
-    env: "RELEASE_SYS_CONFIG=/srv/erlang/releases/0.1.0/sys"
+    env: "RELEASE_SYS_CONFIG=/srv/erlang/releases/0.1.0/sys",
+    # Use VGA console so output is visible via noVNC on Vultr
+    ctty: "tty1"
   ]
 
 # Configure the device for SSH IEx prompt access and firmware updates
@@ -108,8 +84,8 @@ keys =
     Path.join([System.user_home!(), ".ssh", "id_ecdsa.pub"]),
     Path.join([System.user_home!(), ".ssh", "id_ed25519.pub"]),
     Path.join([System.user_home!(), ".ssh", "id_air_laptop.pub"]),
-    Path.join([System.user_home!(), ".ssh", "id_framework_laptop.pub"]),
-    Path.join([System.user_home!(), ".ssh", "id_desktop_rsa.pub"])
+    Path.join([System.user_home!(), ".ssh", "id_desktop_rsa.pub"]),
+    Path.join([System.user_home!(), ".ssh", "id_macbook_air_2014_ed25519.pub"])
   ]
   |> Enum.filter(&File.exists?/1)
 
@@ -143,7 +119,7 @@ config :main_proxy,
   https: [:inet6, port: 443],
   server: true
 
-config :site_encrypt, sites: [{VpsWeb.Endpoint, VpsWeb.SiteEncryptImpl}]
+# site_encrypt is configured via the SiteEncrypt.Phoenix.Endpoint behaviour in VpsWeb.Endpoint
 
 config :logger,
   backends: [RingLogger]
@@ -184,4 +160,4 @@ config :logger,
 # of this file so it overrides the configuration defined above.
 # Uncomment to use target specific configurations
 
-# import_config "#{Mix.target()}.exs"
+import_config "#{Mix.target()}.exs"
