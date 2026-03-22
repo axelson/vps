@@ -41,3 +41,11 @@ Visit http://localhost:8080
 set -x MIX_TARGET vultr; set -x MIX_ENV prod
 mix compile --warnings-as-errors && mix firmware && mix upload vultr
 ```
+
+## Troubleshooting
+
+If the ssl settings are not applied correctly then re-compile the deps
+
+```
+mix deps.compile gviz makeup_live sketchpad jamroom --force
+```
