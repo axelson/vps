@@ -94,8 +94,8 @@ secret = fn -> :crypto.strong_rand_bytes(64) |> Base.encode64() end
 salt = fn -> :crypto.strong_rand_bytes(32) |> Base.encode64() end
 
 # IMPORTANT: Update these domains for your actual deploy
-host = "poc.localhost"
-port = 443
+host = "localhost"
+port = 8080
 
 endpoint_configs = [
   {:gviz, GVizWeb.Endpoint, "depviz.localhost"},

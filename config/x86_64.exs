@@ -12,7 +12,7 @@ import Config
 # (see docs/notes/bootstrapping.md).
 
 {main_host, endpoint_configs, cert_mode, extra_vps_config} =
-  case System.get_env("VPS_INSTANCE", "poc3") do
+  case System.get_env("VPS_INSTANCE", "production") do
     "production" ->
       {"pham.jasonaxelson.com",
        [
@@ -73,8 +73,37 @@ if System.get_env("VPS_INSTANCE") == "qemu" do
   config :vps,
     cert_mode: "local",
     http_mode: :http,
-    # Internal listening port is 80 (mapped to 8080 externally by QEMU)
-    port: 8080
+    # This is the external port (internal listening port is configured via main_proxy)
+    port: 8080,
+    site_encrypt_internal_port: 4106
 
   config :vps, VpsWeb.Endpoint, url: [host: main_host, port: 8080]
+
+  # Enable VpsWeb.Endpoint's own HTTP server so site_encrypt can start the internal
+  # ACME CA (port 4106) and verify HTTP-01 challenges against this endpoint.
+  # Without server: true + http port, http_port/2 returns :error and the internal
+  # ACME server is never started, causing econnrefused on the first cert attempt.
+  # config :vps, VpsWeb.Endpoint,
+  #   server: true,
+  #   http: [:inet6, port: 4105]
+
+  config :gviz, GVizWeb.Endpoint,
+    http: [port: 8080],
+    force_ssl: false
+
+  config :makeup_live, MakeupLiveWeb.Endpoint,
+    http: [port: 8080],
+    force_ssl: false
+
+  config :sketchpad, SketchpadWeb.Endpoint,
+    http: [port: 8080],
+    force_ssl: false
+
+  config :jamroom, JamroomWeb.Endpoint,
+    http: [port: 8080],
+    force_ssl: false
+
+  config :main_proxy,
+    http: [:inet6, port: 80],
+    server: true
 end
