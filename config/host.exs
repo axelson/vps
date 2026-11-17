@@ -4,7 +4,8 @@ endpoint_configs = [
   {:gviz, GVizWeb.Endpoint, "depviz.localhost"},
   {:makeup_live, MakeupLiveWeb.Endpoint, "makeuplive.localhost"},
   {:sketchpad, SketchpadWeb.Endpoint, "sketch.localhost"},
-  {:jamroom, JamroomWeb.Endpoint, "jamroom.localhost"}
+  {:jamroom, JamroomWeb.Endpoint, "jamroom.localhost"},
+  {:file_hosting, FileHostingWeb.Endpoint, "files.localhost"}
 ]
 
 domains = Enum.map(endpoint_configs, fn {_, _, domain} -> domain end)
@@ -80,6 +81,15 @@ config :jamroom, JamroomWeb.Endpoint,
   pubsub_server: Jamroom.InternalPubSub,
   live_view: [signing_salt: "1lqe1yckbnWuFu992XoMQwqb+kCQb1KI"],
   code_reloader: false
+
+config :file_hosting, FileHostingWeb.Endpoint,
+  secret_key_base: "Nq0nY6mI3D1H0k9mXbC7cFq8Yw0Lx2pVt5rJz4sGh1aK6eU3oB9iW7dM2fT8nR5y",
+  render_errors: [formats: [json: FileHostingWeb.ErrorJSON], layout: false],
+  server: false
+
+config :file_hosting,
+  storage_dir: Path.expand("../tmp/file-hosting", __DIR__),
+  api_token: "dev-token"
 
 config :main_proxy,
   http: [:inet6, port: 4000],

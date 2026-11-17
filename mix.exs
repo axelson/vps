@@ -63,6 +63,8 @@ defmodule Vps.MixProject do
       {:makeup_live, github: "axelson/makeup_live_format"},
       {:sketchpad, github: "axelson/sketchpad"},
       {:jamroom, github: "axelson/jamroom"},
+      # In-repo, kept standalone so it can be extracted (see apps/file_hosting/docs/design.md)
+      {:file_hosting, path: "apps/file_hosting"},
 
       # helpers
       {:log_viz, github: "axelson/log_viz"},

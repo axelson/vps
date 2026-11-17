@@ -10,6 +10,8 @@ It powers the following Phoenix sites:
 - https://makeuplive.jasonaxelson.com ([git repo](https://github.com/axelson/makeup_live_format/))
 - https://sketch.jasonaxelson.com ([git repo](https://github.com/axelson/sketchpad/))
 - https://jamroom.jasonaxelson.com ([git repo](https://github.com/axelson/jamroom/))
+- https://files.jasonaxelson.com — static HTML/JS bundle hosting, in this repo at
+  `apps/file_hosting` ([design](apps/file_hosting/docs/design.md))
 
 I spoke about this at CodeBEAM America 2022: https://codebeamamerica.com/participants/Jason-axelson/
 

@@ -42,6 +42,14 @@ config :jamroom, JamroomWeb.Endpoint,
   pubsub_server: Jamroom.InternalPubSub,
   code_reloader: false
 
+config :file_hosting, FileHostingWeb.Endpoint,
+  force_ssl: [rewrite_on: [:x_forwarded_proto]],
+  render_errors: [formats: [json: FileHostingWeb.ErrorJSON], layout: false],
+  server: false
+
+# The API token and secret_key_base come from /data/.target.secret.exs
+config :file_hosting, storage_dir: "/data/file-hosting"
+
 config :gviz, :phoenix_endpoint, GVizWeb.Endpoint
 
 config :gviz, namespace: GViz

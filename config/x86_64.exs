@@ -19,7 +19,8 @@ import Config
          {:gviz, GVizWeb.Endpoint, "depviz.jasonaxelson.com"},
          {:makeup_live, MakeupLiveWeb.Endpoint, "makeuplive.jasonaxelson.com"},
          {:sketchpad, SketchpadWeb.Endpoint, "sketch.jasonaxelson.com"},
-         {:jamroom, JamroomWeb.Endpoint, "jamroom.jasonaxelson.com"}
+         {:jamroom, JamroomWeb.Endpoint, "jamroom.jasonaxelson.com"},
+         {:file_hosting, FileHostingWeb.Endpoint, "files.jasonaxelson.com"}
        ], "production", []}
 
     "poc3" ->
@@ -28,7 +29,8 @@ import Config
          {:gviz, GVizWeb.Endpoint, "depviz.poc3.jasonaxelson.com"},
          {:makeup_live, MakeupLiveWeb.Endpoint, "makeuplive.poc3.jasonaxelson.com"},
          {:sketchpad, SketchpadWeb.Endpoint, "sketch.poc3.jasonaxelson.com"},
-         {:jamroom, JamroomWeb.Endpoint, "jamroom.poc3.jasonaxelson.com"}
+         {:jamroom, JamroomWeb.Endpoint, "jamroom.poc3.jasonaxelson.com"},
+         {:file_hosting, FileHostingWeb.Endpoint, "files.poc3.jasonaxelson.com"}
        ], "production", []}
 
     "qemu" ->
@@ -37,7 +39,8 @@ import Config
          {:gviz, GVizWeb.Endpoint, "depviz.localhost"},
          {:makeup_live, MakeupLiveWeb.Endpoint, "makeuplive.localhost"},
          {:sketchpad, SketchpadWeb.Endpoint, "sketch.localhost"},
-         {:jamroom, JamroomWeb.Endpoint, "jamroom.localhost"}
+         {:jamroom, JamroomWeb.Endpoint, "jamroom.localhost"},
+         {:file_hosting, FileHostingWeb.Endpoint, "files.localhost"}
        ], "local", [site_encrypt_internal_port: 4106]}
   end
 
