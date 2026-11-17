@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# preview <file.html | directory> [port] — serves the content locally under
+# /preview/, the same way it will be served under /<name>/, and prints the URL.
+# Runs until killed.
+set -euo pipefail
+
+target=${1:?usage: preview <file.html | directory> [port]}
+port=${2:-8765}
+root=$(mktemp -d)
+trap 'rm -rf "$root"' EXIT
+
+if [[ -f "$target" ]]; then
+  mkdir "$root/preview"
+  ln -s "$(cd "$(dirname "$target")" && pwd)/$(basename "$target")" "$root/preview/index.html"
+else
+  ln -s "$(cd "$target" && pwd)" "$root/preview"
+fi
+
+echo "http://localhost:$port/preview/"
+exec python3 -m http.server "$port" --bind 127.0.0.1 --directory "$root"

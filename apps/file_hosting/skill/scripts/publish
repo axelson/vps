@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# publish <file.html | directory> [--name NAME] [--yes]
+#
+# Uploads a bundle and prints its URL (also copied to the clipboard). A single
+# .html file is published as the bundle's index.html. The default name is
+# YYYY-MM-DD-<slug of the file or directory name>.
+#
+# Exit codes: 0 published, 1 error, 3 name already exists (re-run with --yes to replace).
+source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
+
+target="" name="" yes=0
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --name) name=$2; shift 2 ;;
+    --yes) yes=1; shift ;;
+    -*) die "unknown option $1" ;;
+    *) target=$1; shift ;;
+  esac
+done
+[[ -n "$target" ]] || die "usage: publish <file.html | directory> [--name NAME] [--yes]"
+[[ -e "$target" ]] || die "not found: $target"
+
+if [[ -z "$name" ]]; then
+  base=$(basename "$target")
+  base=${base%.*}
+  [[ "$base" == "index" && -f "$target" ]] && base=$(basename "$(cd "$(dirname "$target")" && pwd)")
+  slug=$(tr '[:upper:]' '[:lower:]' <<<"$base" | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//')
+  name="$(date +%Y-%m-%d)-${slug:-bundle}"
+  name=${name:0:80}
+  name=${name%-}
+fi
+valid_name "$name" || die "invalid name '$name': use 1-80 of a-z, 0-9 and -, not starting with -"
+
+if [[ $yes -eq 0 ]]; then
+  split_response "$(api GET "/bundles/$name")"
+  case $STATUS in
+    200) echo "exists: $name (updated $(sed -E 's/.*"updated_at":"([^"]*)".*/\1/' <<<"$BODY")); re-run with --yes to replace" >&2; exit 3 ;;
+    404) ;;
+    *) die "checking $name failed ($STATUS): $BODY" ;;
+  esac
+fi
+
+work=$(mktemp -d)
+trap 'rm -rf "$work"' EXIT
+
+if [[ -f "$target" ]]; then
+  [[ "$target" =~ \.html?$ ]] || die "a single file must be .html"
+  mkdir "$work/bundle"
+  cp "$target" "$work/bundle/index.html"
+  dir="$work/bundle"
+else
+  dir=$target
+fi
+
+COPYFILE_DISABLE=1 tar -czf "$work/bundle.tar.gz" -C "$dir" \
+  --exclude .git --exclude node_modules --exclude .DS_Store .
+
+split_response "$(api PUT "/bundles/$name" -H 'Content-Type: application/gzip' \
+  --data-binary "@$work/bundle.tar.gz")"
+[[ $STATUS == 200 ]] || die "publish failed ($STATUS): $BODY"
+
+url="$FILE_HOSTING_URL/$name/"
+command -v pbcopy >/dev/null && printf '%s' "$url" | pbcopy
+echo "$url"

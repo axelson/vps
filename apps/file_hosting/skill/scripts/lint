@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# lint <file.html | directory> — checks that the content works as a bundle served
+# under /<name>/. Builds the Go linter into ../bin on first use or when its source changes.
+set -euo pipefail
+
+skill_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+src="$skill_dir/lint"
+bin="$skill_dir/bin/lint"
+
+if [[ ! -x "$bin" || -n "$(find "$src" -newer "$bin" -type f 2>/dev/null)" ]]; then
+  command -v go >/dev/null || { echo "error: go is required to build the linter" >&2; exit 2; }
+  mkdir -p "$skill_dir/bin"
+  (cd "$src" && go build -o "$bin" .)
+fi
+
+exec "$bin" "$@"

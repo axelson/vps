@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# list — prints every bundle: name, updated_at, size, file count.
+source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
+
+split_response "$(api GET /bundles)"
+[[ $STATUS == 200 ]] || die "list failed ($STATUS): $BODY"
+
+if command -v jq >/dev/null; then
+  jq -r '.bundles[] | [.name, .updated_at, "\(.size_bytes)B", "\(.file_count) files"] | @tsv' <<<"$BODY" |
+    column -t -s $'\t'
+else
+  echo "$BODY"
+fi
