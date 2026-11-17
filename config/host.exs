@@ -48,7 +48,10 @@ config :makeup_live, MakeupLiveWeb.Endpoint,
   secret_key_base: "cWT5GRJqD2MEmsQfeK86J2HgmZxi6YA/Fx/Y8wjhRnnAVZO0uJz+aI+2Nsck71dF",
   check_origin: false,
   root: Path.dirname(__DIR__),
-  render_errors: [formats: [html: MakeupLiveWeb.ErrorHTML, json: MakeupLiveWeb.ErrorJSON], layout: false],
+  render_errors: [
+    formats: [html: MakeupLiveWeb.ErrorHTML, json: MakeupLiveWeb.ErrorJSON],
+    layout: false
+  ],
   pubsub_server: MakeupLive.PubSub,
   server: false,
   cache_static_manifest: "priv/static/cache_manifest.json",
@@ -56,7 +59,10 @@ config :makeup_live, MakeupLiveWeb.Endpoint,
 
 config :sketchpad, SketchpadWeb.Endpoint,
   secret_key_base: "BCqHloAfzORpn/TX90PB9GULWVRZpjwegD4U8T1on/RUmEYTjkVGLC2YKFhkhLiS",
-  render_errors: [formats: [html: SketchpadWeb.ErrorHTML, json: SketchpadWeb.ErrorJSON], layout: false],
+  render_errors: [
+    formats: [html: SketchpadWeb.ErrorHTML, json: SketchpadWeb.ErrorJSON],
+    layout: false
+  ],
   check_origin: false,
   root: Path.dirname(__DIR__),
   server: false,

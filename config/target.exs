@@ -13,14 +13,20 @@ config :makeup_live, MakeupLiveWeb.Endpoint,
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
   # check_origin: false,
   root: Path.dirname(__DIR__),
-  render_errors: [formats: [html: MakeupLiveWeb.ErrorHTML, json: MakeupLiveWeb.ErrorJSON], layout: false],
+  render_errors: [
+    formats: [html: MakeupLiveWeb.ErrorHTML, json: MakeupLiveWeb.ErrorJSON],
+    layout: false
+  ],
   pubsub_server: MakeupLive.PubSub,
   cache_static_manifest: "priv/static/cache_manifest.json",
   server: false
 
 config :sketchpad, SketchpadWeb.Endpoint,
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
-  render_errors: [formats: [html: SketchpadWeb.ErrorHTML, json: SketchpadWeb.ErrorJSON], layout: false],
+  render_errors: [
+    formats: [html: SketchpadWeb.ErrorHTML, json: SketchpadWeb.ErrorJSON],
+    layout: false
+  ],
   # check_origin: false,
   root: Path.dirname(__DIR__),
   cache_static_manifest: "priv/static/cache_manifest.json",

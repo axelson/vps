@@ -48,7 +48,6 @@ defmodule Vps.MixProject do
       {:telemetry_poller, "~> 1.0"},
       {:jason, "~> 1.0"},
       {:bandit, ">= 0.6.8"},
-
       {:site_encrypt, "~> 0.7.0"},
       # {:site_encrypt, path: "~/dev/forks/site_encrypt"},
       # {:site_encrypt, github: "axelson/site_encrypt", branch: "update-deps"},
