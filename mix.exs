@@ -37,7 +37,7 @@ defmodule Vps.MixProject do
   defp deps do
     [
       # Dependencies for all targets
-      {:nerves, "~> 1.13.2", runtime: false},
+      {:nerves, "~> 1.15", runtime: false},
       {:shoehorn, "~> 0.9.1"},
       {:ring_logger, "~> 0.10"},
       {:toolshed, "~> 0.3"},
@@ -76,7 +76,7 @@ defmodule Vps.MixProject do
       # Dependencies for specific targets
       {:nerves_system_x86_64, "~> 1.33", runtime: false, targets: :x86_64},
       # General
-      {:nerves_system_br, "~> 1.33.4", runtime: false}
+      {:nerves_system_br, "~> 1.35", runtime: false}
     ]
   end
 
