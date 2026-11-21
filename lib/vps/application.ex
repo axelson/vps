@@ -15,6 +15,12 @@ defmodule Vps.Application do
         {Phoenix.PubSub, name: Vps.PubSub},
         Vps.Repo,
         VpsWeb.Endpoint,
+        # Before MyProxy, which reads their certificate paths. site_encrypt gives every
+        # endpoint the same child id, so set distinct ones.
+        for(
+          {cert_endpoint, _} <- VpsWeb.Certs.isolated(),
+          do: Supervisor.child_spec(cert_endpoint, id: cert_endpoint)
+        ),
         VpsWeb.MyProxy,
         children(target()),
         Vps.StartupLogger

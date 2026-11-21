@@ -105,16 +105,22 @@ The `vps` firmware includes it as `{:file_hosting, path: "apps/file_hosting"}`. 
 endpoint runs with `server: false`; `VpsWeb.MyProxy` routes the hostname to it via the
 `:endpoint_configs` entry `{:file_hosting, FileHostingWeb.Endpoint, "<host>"}`.
 
+Its hostname has a TLS certificate of its own, separate from the certificate the
+other vps sites share, so a validation failure on one can't block renewal of the
+other. vps owns this (`VpsWeb.Certs`, `VpsWeb.FilesCertEndpoint`); the app itself
+knows nothing about certificates.
+
 Dev: `files.localhost:4000`, token `dev-token`, storage in `tmp/file-hosting/`.
 
 ### Production checklist
 
-1. DNS A record for `files.jasonaxelson.com` → the VPS. Do this **before** deploying:
-   site_encrypt requests one certificate for all domains, so an unresolvable domain
-   breaks issuance for every site.
+1. DNS A record for `files.jasonaxelson.com` → the VPS. Its certificate is ordered at
+   boot; if DNS isn't ready, only this hostname is affected, and `:init.restart()`
+   (or `SiteEncrypt.force_certify(VpsWeb.FilesCertEndpoint)`) retries once it is.
 2. Add `{:file_hosting, FileHostingWeb.Endpoint, "files.jasonaxelson.com"}` to
-   `endpoint_configs`, and the domain to `site_encrypt_domains`, in both
-   `config/x86_64.exs` (done) and the device's `/data/.target.secret.exs`.
+   `endpoint_configs` in both `config/x86_64.exs` (done) and the device's
+   `/data/.target.secret.exs`. Listing it in `site_encrypt_domains` is harmless: it is
+   left off the shared certificate either way.
 3. In `/data/.target.secret.exs`:
    ```elixir
    config :file_hosting, api_token: "<random>"

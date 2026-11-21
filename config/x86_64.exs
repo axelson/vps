@@ -41,7 +41,7 @@ import Config
          {:sketchpad, SketchpadWeb.Endpoint, "sketch.localhost"},
          {:jamroom, JamroomWeb.Endpoint, "jamroom.localhost"},
          {:file_hosting, FileHostingWeb.Endpoint, "files.localhost"}
-       ], "local", [site_encrypt_internal_port: 4106]}
+       ], "local", [site_encrypt_internal_port: 4106, site_encrypt_internal_ports: [files: 4108]]}
   end
 
 domains = Enum.map(endpoint_configs, fn {_, _, domain} -> domain end)
@@ -78,7 +78,8 @@ if System.get_env("VPS_INSTANCE") == "qemu" do
     http_mode: :http,
     # This is the external port (internal listening port is configured via main_proxy)
     port: 8080,
-    site_encrypt_internal_port: 4106
+    site_encrypt_internal_port: 4106,
+    site_encrypt_internal_ports: [files: 4108]
 
   config :vps, VpsWeb.Endpoint, url: [host: main_host, port: 8080]
 

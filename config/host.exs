@@ -17,7 +17,8 @@ config :vps,
   cert_mode: "local",
   site_encrypt_domains: ["pham.test"] ++ domains,
   site_encrypt_db_folder: Path.join([System.get_env("HOME"), "dev/vps/vps/tmp"]),
-  site_encrypt_internal_port: 4106
+  site_encrypt_internal_port: 4106,
+  site_encrypt_internal_ports: [files: 4108]
 
 config :vps, Vps.Repo, database: "priv/database.db"
 
@@ -81,6 +82,11 @@ config :jamroom, JamroomWeb.Endpoint,
   pubsub_server: Jamroom.InternalPubSub,
   live_view: [signing_salt: "1lqe1yckbnWuFu992XoMQwqb+kCQb1KI"],
   code_reloader: false
+
+# Its own HTTP server lets the local ACME CA validate challenges against it directly
+config :vps, VpsWeb.FilesCertEndpoint,
+  server: true,
+  http: [port: 4107]
 
 config :file_hosting, FileHostingWeb.Endpoint,
   secret_key_base: "Nq0nY6mI3D1H0k9mXbC7cFq8Yw0Lx2pVt5rJz4sGh1aK6eU3oB9iW7dM2fT8nR5y",

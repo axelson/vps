@@ -42,6 +42,8 @@ config :jamroom, JamroomWeb.Endpoint,
   pubsub_server: Jamroom.InternalPubSub,
   code_reloader: false
 
+config :vps, VpsWeb.FilesCertEndpoint, server: false
+
 config :file_hosting, FileHostingWeb.Endpoint,
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
   render_errors: [formats: [json: FileHostingWeb.ErrorJSON], layout: false],

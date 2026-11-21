@@ -51,25 +51,8 @@ defmodule VpsWeb.Endpoint do
   plug(Plug.Session, @session_options)
   plug(VpsWeb.Router)
 
+  # The main certificate; isolated hostnames have their own (see VpsWeb.Certs)
   def certification do
-    SiteEncrypt.configure(
-      # id: VpsWeb.Endpoint,
-      # callback: VpsWeb.SiteEncryptImpl,
-      client: :native,
-      domains: Application.fetch_env!(:vps, :site_encrypt_domains),
-      emails: ["contact@jasonaxelson.com"],
-      db_folder: Application.fetch_env!(:vps, :site_encrypt_db_folder),
-      directory_url:
-        case Application.get_env(:vps, :cert_mode, "local") do
-          "local" ->
-            {:internal, port: Application.fetch_env!(:vps, :site_encrypt_internal_port)}
-
-          "staging" ->
-            "https://acme-staging-v02.api.letsencrypt.org/directory"
-
-          "production" ->
-            "https://acme-v02.api.letsencrypt.org/directory"
-        end
-    )
+    SiteEncrypt.configure(VpsWeb.Certs.configure_opts(nil, VpsWeb.Certs.main_domains()))
   end
 end
