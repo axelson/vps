@@ -77,7 +77,7 @@ Add a wildcard A record pointing to the new VM's IP — this covers all subdomai
 
 Adjust the subdomain to match the instance name (e.g. `*.poc3.jasonaxelson.com` for poc3).
 
-Note: if you don't want to use a wildcard then you need to use a DNS record for each subdomain
+Note: if you don't want to use a wildcard then you need to use a DNS record for each subdomain, including `files.` (file_hosting)
 
 ---
 
@@ -92,6 +92,7 @@ Generate secrets and configure domains (replace `poc3.jasonaxelson.com` with the
 ```elixir
 secret = fn -> :crypto.strong_rand_bytes(64) |> Base.encode64() end
 salt = fn -> :crypto.strong_rand_bytes(32) |> Base.encode64() end
+file_hosting_token = :crypto.strong_rand_bytes(32) |> Base.url_encode64(padding: false)
 
 # IMPORTANT: Update these domains for your actual deploy
 host = "localhost"
@@ -101,7 +102,8 @@ endpoint_configs = [
   {:gviz, GVizWeb.Endpoint, "depviz.localhost"},
   {:makeup_live, MakeupLiveWeb.Endpoint, "makeuplive.localhost"},
   {:sketchpad, SketchpadWeb.Endpoint, "sketch.localhost"},
-  {:jamroom, JamroomWeb.Endpoint, "jamroom.localhost"}
+  {:jamroom, JamroomWeb.Endpoint, "jamroom.localhost"},
+  {:file_hosting, FileHostingWeb.Endpoint, "files.localhost"}
 ]
 
 domains = Enum.map(endpoint_configs, fn {_, _, d} -> d end)
@@ -129,7 +131,17 @@ config :gviz, GVizWeb.Endpoint, secret_key_base: "#{secret.()}", live_view: [sig
 config :makeup_live, MakeupLiveWeb.Endpoint, secret_key_base: "#{secret.()}", live_view: [signing_salt: "#{salt.()}"]
 config :sketchpad, SketchpadWeb.Endpoint, secret_key_base: "#{secret.()}", live_view: [signing_salt: "#{salt.()}"]
 config :jamroom, JamroomWeb.Endpoint, secret_key_base: "#{secret.()}", live_view: [signing_salt: "#{salt.()}"]
+config :file_hosting, FileHostingWeb.Endpoint, secret_key_base: "#{secret.()}"
+config :file_hosting, api_token: "#{file_hosting_token}"
 """)
+
+IO.puts("file_hosting API token: #{file_hosting_token}")
+```
+
+Save the printed file_hosting token in your laptop's Keychain for the `/public-file-hosting` skill:
+
+```sh
+security add-generic-password -s file-hosting -a "$USER" -w '<token>'
 ```
 
 Then restart the BEAM to pick up the new config (no full reboot needed):
@@ -156,7 +168,10 @@ site_encrypt generates a self-signed cert on first boot and schedules real cert 
 
 ```elixir
 SiteEncrypt.force_certify(VpsWeb.Endpoint)
+SiteEncrypt.force_certify(VpsWeb.FilesCertEndpoint)
 ```
+
+`files.` has a certificate of its own (see `VpsWeb.Certs`), so it is issued separately; a failure on one doesn't affect the other.
 
 Watch the IEx console for `Certificate successfully obtained!` (via `RingLogger.attach`).
 
@@ -171,5 +186,6 @@ Note: you may need to wait 5-30 minutes before this works due to DNS propagation
 - `https://makeuplive.poc3.jasonaxelson.com/` — makeup_live loads
 - `https://sketch.poc3.jasonaxelson.com/` — sketchpad loads
 - `https://jamroom.poc3.jasonaxelson.com/` — jamroom loads
+- `https://files.poc3.jasonaxelson.com/` — valid TLS cert, plain "Not found" (there is no index page); `FILE_HOSTING_URL=https://files.poc3.jasonaxelson.com apps/file_hosting/skill/scripts/list` lists bundles
 - SSH: `ssh nerves@<vm-ip>`
 - OTA update: `MIX_TARGET=x86_64 MIX_ENV=prod ./upload.sh <vm-ip>`

@@ -18,6 +18,10 @@ export VPS_INSTANCE=production MIX_TARGET=x86_64 MIX_ENV=prod
 mix compile --warnings-as-errors && mix firmware && ./upload.sh vultr
 ```
 
+The first deploy that includes file_hosting (files.jasonaxelson.com) needs DNS, a
+secret-file update, and a Keychain token; see the production checklist in
+`apps/file_hosting/docs/design.md`.
+
 If `upload.sh` doesn't exist, generate it first:
 
 ```sh
